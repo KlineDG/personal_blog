@@ -1,4 +1,5 @@
 import type { Post } from "../data/posts";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 
 export type PostCardTheme = {
   subtleText: string;
@@ -40,7 +41,7 @@ export function PostCard({
     <article
       className={`group rounded-md border transition-colors duration-300 ${
         variant === "featured" ? themeStyles.surface : themeStyles.border
-      } ${containerPadding} hover:border-[var(--accent)] hover:bg-[rgba(212,175,227,0.08)]`}
+      } ${containerPadding} hover:border-[var(--accent)]`}
     >
       {(post.category || post.readingTime) && (
         <div
@@ -65,7 +66,7 @@ export function PostCard({
               : variant === "featured"
               ? "text-zinc-900"
               : ""
-          } group-hover:text-[var(--accent)]`}
+          } `}
         >
           <a
             href="#"
@@ -101,13 +102,13 @@ export function PostCard({
         <button
           type="button"
           aria-label={`Save ${post.title}`}
-          className={`flex h-9 w-9 items-center justify-center rounded-sm border border-transparent text-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
+          className={`flex h-9 w-9 items-center justify-center rounded-sm text-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
             theme === "night"
-              ? `text-zinc-300 hover:border-[var(--accent)] ${accentHoverBackground.night} hover:text-[var(--accent)]`
-              : `text-zinc-600 hover:border-[var(--accent)] ${accentHoverBackground.day} hover:text-[var(--accent)]`
+              ? `text-zinc-300 hover:border-[var(--accent)] hover:text-yellow-300`
+              : `text-zinc-600 hover:border-[var(--accent)] hover:text-yellow-300`
           }`}
         >
-          <span aria-hidden>🔖</span>
+          <Bookmark aria-hidden />
         </button>
       </div>
     </article>
