@@ -53,7 +53,7 @@ export function AuthShell({
       style={{ "--accent": accentColor } as CSSProperties}
     >
       <header className="flex items-center justify-between px-8 py-6">
-        <span className="barcode-logo text-2xl uppercase tracking-[0.45em]" style={{ color: accentColor }}>
+        <span className="barcode-logo text-4xl uppercase" style={{ color: accentColor }}>
           D. kline
         </span>
         <button
