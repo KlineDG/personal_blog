@@ -1,5 +1,30 @@
 import type { Post } from "../data/posts";
-import { Bookmark, BookmarkCheck } from "lucide-react";
+
+const BookmarkIcon = ({
+  filled = false,
+  className = "",
+}: {
+  filled?: boolean;
+  className?: string;
+}) => (
+  <svg
+    aria-hidden
+    className={className}
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path
+      d="M6 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17l-6-3.5L6 20Z"
+      fill={filled ? "currentColor" : "none"}
+    />
+  </svg>
+);
 
 export type PostCardTheme = {
   subtleText: string;
@@ -15,11 +40,6 @@ type PostCardProps = {
   themeStyles: PostCardTheme;
   variant?: "default" | "featured";
 };
-
-const accentHoverBackground = {
-  day: "hover:bg-[rgba(212,175,227,0.18)]",
-  night: "hover:bg-[rgba(212,175,227,0.12)]",
-} as const;
 
 export function PostCard({
   post,
@@ -108,7 +128,7 @@ export function PostCard({
               : `text-zinc-600 hover:border-[var(--accent)] hover:text-yellow-300`
           }`}
         >
-          <Bookmark aria-hidden />
+          <BookmarkIcon />
         </button>
       </div>
     </article>
