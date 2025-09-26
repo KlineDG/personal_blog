@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const featuredPost = {
   title: "Building a mindful writing practice",
@@ -43,6 +43,8 @@ export default function Home() {
   const [theme, setTheme] = useState<"day" | "night">("night");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
 
   const categories = useMemo(() => ["All", ...new Set(posts.map((post) => post.category))], []);
 
@@ -93,7 +95,21 @@ export default function Home() {
             D. kline
           </span>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <div className="flex items-center gap-2 sm:justify-end">
+            <div
+              ref={searchContainerRef}
+              className="relative flex w-full min-w-[12rem] items-center gap-2 sm:w-64 sm:justify-end"
+              onBlur={(event) => {
+                if (
+                  searchContainerRef.current &&
+                  event.relatedTarget instanceof Node &&
+                  searchContainerRef.current.contains(event.relatedTarget)
+                ) {
+                  return;
+                }
+
+                setIsCategoryMenuOpen(false);
+              }}
+            >
               <label className="sr-only" htmlFor="site-search">
                 Search posts
               </label>
@@ -102,26 +118,50 @@ export default function Home() {
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
+                onFocus={() => setIsCategoryMenuOpen(true)}
+                onKeyDown={() => setIsCategoryMenuOpen(true)}
                 placeholder="Search notes"
-                className={`h-10 w-full min-w-[12rem] rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 sm:w-64 ${themeStyles.input}`}
+                className={`h-10 w-full rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
               />
-            </div>
-            <div className="flex items-center gap-2 sm:justify-end">
-              <label className="sr-only" htmlFor="category-filter">
-                Filter posts by category
-              </label>
-              <select
-                id="category-filter"
-                value={selectedCategory}
-                onChange={(event) => setSelectedCategory(event.target.value)}
-                className={`h-10 rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+              {isCategoryMenuOpen && (
+                <div
+                  role="listbox"
+                  aria-label="Filter posts by category"
+                  className={`absolute left-0 top-full z-20 mt-2 w-full rounded-sm border p-2 shadow-lg backdrop-blur ${themeStyles.surface}`}
+                >
+                  <p className={`mb-2 text-xs uppercase tracking-[0.35em] ${themeStyles.subtleText}`}>Browse categories</p>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedCategory === category}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsCategoryMenuOpen(false);
+                        }}
+                        className="rounded-full border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200"
+                        style={
+                          selectedCategory === category
+                            ? {
+                                borderColor: accentColor,
+                                backgroundColor: `${accentColor}1a`,
+                                color: accentColor,
+                              }
+                            : {
+                                borderColor: `${accentColor}40`,
+                                color: theme === "night" ? "#d0c6d6" : "#6b4f7b",
+                              }
+                        }
+                        onFocus={() => setIsCategoryMenuOpen(true)}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </nav>
