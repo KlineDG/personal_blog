@@ -52,7 +52,7 @@ export function AuthShell({
       className={`flex min-h-screen flex-col font-mono transition-colors duration-500 ${tokens.page} ${tokens.text}`}
       style={{ "--accent": accentColor } as CSSProperties}
     >
-      <header className="flex items-center justify-between px-8 py-6">
+      <header className="mx-auto mt-10 flex w-full max-w-4xl items-center justify-between px-6 py-3">
         <span className="barcode-logo text-4xl uppercase" style={{ color: accentColor }}>
           D. kline
         </span>
@@ -67,9 +67,8 @@ export function AuthShell({
           <span aria-hidden>{theme === "night" ? "☀" : "☾"}</span>
         </button>
       </header>
-      <div className="flex flex-1 items-center justify-center px-6 pb-16 pt-8 sm:px-8">
-        <div className={`w-full max-w-sm rounded-sm ${tokens.panel} px-6 py-8 sm:px-8`}>
-          <div className={`mb-8 text-xs uppercase tracking-[0.45em] ${tokens.subtle}`}>Access</div>
+      <div className="flex flex-1 items-center justify-center px-6 pb-16 pt-10 sm:px-10">
+        <div className={`w-full max-w-xl rounded-sm ${tokens.panel} px-8 py-10 sm:px-12 lg:max-w-2xl`}>
           {children}
         </div>
       </div>
