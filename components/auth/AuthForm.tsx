@@ -39,7 +39,7 @@ type ThemeTokens = {
 const themeTokens: Record<AuthTheme, ThemeTokens> = {
   night: {
     field:
-      "border border-white/12 bg-[rgba(10,10,16,0.82)] px-4 py-3 text-sm text-zinc-100 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/40 placeholder:text-zinc-500",
+      "w-full border border-white/12 bg-[rgba(10,10,16,0.82)] px-4 py-3 text-sm text-zinc-100 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/40 placeholder:text-zinc-500",
     label: "text-[10px] uppercase tracking-[0.4em] text-zinc-500",
     submit:
       "flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[var(--accent)] px-4 text-sm font-semibold text-[#120813] transition hover:bg-[#e6d4f0] disabled:cursor-wait disabled:opacity-70",
@@ -55,7 +55,7 @@ const themeTokens: Record<AuthTheme, ThemeTokens> = {
   },
   day: {
     field:
-      "border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/30 placeholder:text-zinc-400",
+      "w-full border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/30 placeholder:text-zinc-400",
     label: "text-[10px] uppercase tracking-[0.4em] text-zinc-500",
     submit:
       "flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[var(--accent)] px-4 text-sm font-semibold text-[#1f0b2a] transition hover:bg-[#e7d8f1] disabled:cursor-wait disabled:opacity-70",
@@ -87,7 +87,7 @@ export function AuthForm({
   const tokens = themeTokens[theme];
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       {!supabaseReady && (
         <div className={tokens.supabase}>
           Supply NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth.
@@ -98,8 +98,8 @@ export function AuthForm({
 
       {info && <div className={tokens.info}>{info}</div>}
 
-      <form className="space-y-5" onSubmit={onSubmit} noValidate>
-        <div className="space-y-2">
+      <form className="space-y-7" onSubmit={onSubmit} noValidate>
+        <div className="space-y-3">
           <label className={tokens.label} htmlFor="email">
             Email
           </label>
@@ -115,7 +115,7 @@ export function AuthForm({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <label className={tokens.label} htmlFor="password">
             Password
           </label>
@@ -133,7 +133,7 @@ export function AuthForm({
         </div>
 
         {mode === "signup" && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className={tokens.label} htmlFor="confirmPassword">
               Confirm password
             </label>
@@ -162,7 +162,7 @@ export function AuthForm({
         </button>
       </form>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <button type="button" onClick={onToggleMode} className={tokens.outline}>
           {mode === "signin" ? "Create account" : "Use existing"}
         </button>
