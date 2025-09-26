@@ -2,43 +2,16 @@
 
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 
-const featuredPost = {
-  title: "Building a mindful writing practice",
-  date: "June 2, 2024",
-  excerpt:
-    "How small, consistent rituals can turn writing from a task into a grounding daily habit.",
-  tags: ["Mindful", "Systems"],
-};
-
-const posts = [
-  {
-    title: "Designing a personal knowledge garden",
-    date: "May 28, 2024",
-    excerpt:
-      "Notes on the tools and structures I'm using to grow a digital space that actually helps ideas mature.",
-    readingTime: "6 min read",
-    category: "Design",
-  },
-  {
-    title: "Setting up frictionless blogging with Next.js",
-    date: "May 15, 2024",
-    excerpt:
-      "From content modelling to deployment pipelines, here are the tweaks that made publishing fast again.",
-    readingTime: "8 min read",
-    category: "Engineering",
-  },
-  {
-    title: "What I'm learning from a month of analog sketching",
-    date: "May 2, 2024",
-    excerpt:
-      "Mixing ink, paper, and digital post-processing taught me more about observation than any plugin ever has.",
-    readingTime: "5 min read",
-    category: "Practice",
-  },
-];
+import { PostCard, type PostCardTheme } from "../components/PostCard";
+import { featuredPost, posts } from "../data/posts";
 
 const accentColor = "#d4afe3";
 const accentHoverColor = "#e3c4f0";
+
+type ThemeConfig = PostCardTheme & {
+  page: string;
+  input: string;
+};
 
 export default function Home() {
   const [theme, setTheme] = useState<"day" | "night">("night");
@@ -56,9 +29,21 @@ export default function Home() {
     [],
   );
 
-  const categories = useMemo(() => ["All", ...new Set(posts.map((post) => post.category))], []);
+  const categories = useMemo(
+    () => [
+      "All",
+      ...Array.from(
+        new Set(
+          posts
+            .map((post) => post.category)
+            .filter((category): category is string => Boolean(category)),
+        ),
+      ),
+    ],
+    [],
+  );
 
-  const themeStyles = useMemo(
+  const themeStyles = useMemo<ThemeConfig>(
     () =>
       theme === "night"
         ? {
@@ -157,12 +142,14 @@ export default function Home() {
                             setSelectedCategory(category);
                             setIsCategoryMenuOpen(false);
                           }}
-                          className={`rounded-full px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
+                          className={`rounded-sm border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
                             isSelected
-                              ? "bg-[#d4afe3] text-[#1f0b2a]"
+                              ? theme === "night"
+                                ? "border-[var(--accent)] text-zinc-100"
+                                : "border-[var(--accent)] text-zinc-800"
                               : theme === "night"
-                                ? "bg-white/10 text-zinc-200 hover:bg-[rgba(212,175,227,0.25)] hover:text-[#1f0b2a]"
-                                : "bg-[#f1e3f7] text-[#6b4f7b] hover:bg-[rgba(212,175,227,0.35)] hover:text-[#1f0b2a]"
+                                ? "border-transparent text-zinc-300 hover:border-[var(--accent)] hover:text-zinc-100"
+                                : "border-transparent text-zinc-600 hover:border-[var(--accent)] hover:text-zinc-900"
                           } cursor-pointer`}
                           onFocus={() => setIsCategoryMenuOpen(true)}
                         >
@@ -206,40 +193,11 @@ export default function Home() {
           </p>
         </header>
 
-        <section className={`space-y-8 rounded-md border p-8 transition-colors duration-300 ${themeStyles.surface}`}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.35em] opacity-80" style={{ color: accentColor }}>
-                Featured
-              </p>
-              <h2 className={`text-2xl font-semibold sm:text-3xl ${theme === "night" ? "text-white" : "text-zinc-900"}`}>
-                {featuredPost.title}
-              </h2>
-            </div>
-            <time className={`text-sm ${themeStyles.subtleText}`} dateTime="2024-06-02">
-              {featuredPost.date}
-            </time>
-          </div>
-          <p className={`text-base sm:text-lg ${themeStyles.surfaceText}`}>{featuredPost.excerpt}</p>
-          <div className="flex flex-wrap gap-2">
-            {featuredPost.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-[rgba(212,175,227,0.18)] px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-[#7c5a99]"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <button
-            type="button"
-            className="inline-flex w-max items-center gap-2 rounded-sm bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#1f0b2a] transition-colors duration-300 hover:bg-[var(--accent-hover)] cursor-pointer"
-          >
-            Continue reading
-            <span aria-hidden className="text-lg">
-              →
-            </span>
-          </button>
+        <section className="space-y-4">
+          <p className="text-xs uppercase tracking-[0.35em] opacity-80" style={{ color: accentColor }}>
+            Featured
+          </p>
+          <PostCard post={featuredPost} theme={theme} themeStyles={themeStyles} variant="featured" />
         </section>
 
         <section className="space-y-8">
@@ -255,30 +213,9 @@ export default function Home() {
               View archive →
             </a>
           </div>
-          <div className="space-y-10">
+          <div className="space-y-6">
             {filteredPosts.map((post) => (
-              <article key={post.title} className={`space-y-4 border-b pb-8 last:border-b-0 last:pb-0 ${themeStyles.border}`}>
-                <div className={`flex flex-wrap items-center justify-between gap-2 text-xs ${themeStyles.subtleText}`}>
-                  <time dateTime={post.date}>{post.date}</time>
-                  <div className="flex items-center gap-3">
-                    <span className="uppercase tracking-[0.3em]">{post.category}</span>
-                    <span>{post.readingTime}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold transition-colors duration-200" style={{ color: accentColor }}>
-                    <a href="#">{post.title}</a>
-                  </h3>
-                  <p className={`text-base sm:text-lg ${themeStyles.bodyText}`}>{post.excerpt}</p>
-                </div>
-                <a
-                  className="inline-flex items-center gap-2 text-sm font-medium transition-colors duration-200"
-                  style={{ color: accentColor }}
-                  href="#"
-                >
-                  Read story <span aria-hidden className="text-lg">→</span>
-                </a>
-              </article>
+              <PostCard key={post.title} post={post} theme={theme} themeStyles={themeStyles} />
             ))}
             {filteredPosts.length === 0 && (
               <p className={`text-sm ${themeStyles.subtleText}`}>
