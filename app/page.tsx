@@ -17,6 +17,7 @@ const posts = [
     excerpt:
       "Notes on the tools and structures I'm using to grow a digital space that actually helps ideas mature.",
     readingTime: "6 min read",
+    category: "Design Systems",
   },
   {
     title: "Setting up frictionless blogging with Next.js",
@@ -24,6 +25,7 @@ const posts = [
     excerpt:
       "From content modelling to deployment pipelines, here are the tweaks that made publishing fast again.",
     readingTime: "8 min read",
+    category: "Engineering",
   },
   {
     title: "What I'm learning from a month of analog sketching",
@@ -31,6 +33,7 @@ const posts = [
     excerpt:
       "Mixing ink, paper, and digital post-processing taught me more about observation than any plugin ever has.",
     readingTime: "5 min read",
+    category: "Practice",
   },
 ];
 
@@ -38,6 +41,10 @@ const accentColor = "#d4afe3";
 
 export default function Home() {
   const [theme, setTheme] = useState<"day" | "night">("night");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const categories = useMemo(() => ["All", ...new Set(posts.map((post) => post.category))], []);
 
   const themeStyles = useMemo(
     () =>
@@ -46,52 +53,101 @@ export default function Home() {
             page: "bg-[#0b0b0f] text-zinc-100",
             subtleText: "text-zinc-400",
             bodyText: "text-zinc-300",
-            surface: "border-white/10 bg-white/5",
+            surface: "border-white/15 bg-white/5",
             border: "border-white/10",
-            input: "border-white/15 bg-black/30 text-zinc-100 placeholder:text-zinc-500",
+            input:
+              "border-white/20 bg-black/30 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
             surfaceText: "text-zinc-200",
           }
         : {
             page: "bg-[#fdfbff] text-zinc-900",
             subtleText: "text-zinc-500",
             bodyText: "text-zinc-600",
-            surface: "border-zinc-200 bg-white",
+            surface: "border-zinc-200 bg-white/90",
             border: "border-zinc-200",
-            input: "border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400",
+            input:
+              "border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
             surfaceText: "text-zinc-700",
           },
     [theme],
   );
 
+  const filteredPosts = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    return posts.filter((post) => {
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        [post.title, post.excerpt].some((field) => field.toLowerCase().includes(normalizedQuery));
+      const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+
+      return matchesQuery && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
   return (
     <div className={`min-h-screen transition-colors duration-500 ${themeStyles.page}`}>
       <div className="mx-auto flex max-w-4xl flex-col gap-20 px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
-        <nav className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setTheme((mode) => (mode === "night" ? "day" : "night"))}
-            aria-label="Toggle day and night theme"
-            className={`flex h-10 w-10 items-center justify-center rounded-md border text-base transition-colors duration-300 ${
-              theme === "night"
-                ? "border-white/20 text-zinc-200 hover:border-[rgba(212,175,227,0.6)] hover:text-[#d4afe3]"
-                : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:text-[#d4afe3]"
-            }`}
-          >
-            <span aria-hidden>{theme === "night" ? "☾" : "☀"}</span>
-          </button>
+        <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="barcode-logo text-2xl uppercase" style={{ color: accentColor }}>
             D. kline
           </span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <div className="flex items-center gap-2 sm:justify-end">
+              <label className="sr-only" htmlFor="site-search">
+                Search posts
+              </label>
+              <input
+                id="site-search"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search notes"
+                className={`h-10 w-full min-w-[12rem] rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 sm:w-64 ${themeStyles.input}`}
+              />
+            </div>
+            <div className="flex items-center gap-2 sm:justify-end">
+              <label className="sr-only" htmlFor="category-filter">
+                Filter posts by category
+              </label>
+              <select
+                id="category-filter"
+                value={selectedCategory}
+                onChange={(event) => setSelectedCategory(event.target.value)}
+                className={`h-10 rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </nav>
 
-        <header className="space-y-6">
-          <div className="space-y-2">
-            <span className="text-xs uppercase tracking-[0.5em] opacity-80" style={{ color: accentColor }}>
-              Journal
-            </span>
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-              Writing about craft, curiosity, and the slow web.
-            </h1>
+        <header className="space-y-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.5em] opacity-80" style={{ color: accentColor }}>
+                Journal
+              </span>
+              <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
+                Writing about craft, curiosity, and the slow web.
+              </h1>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTheme((mode) => (mode === "night" ? "day" : "night"))}
+              aria-label="Toggle day and night theme"
+              className={`flex h-10 w-10 items-center justify-center rounded-sm border text-base transition-colors duration-300 ${
+                theme === "night"
+                  ? "border-white/20 text-zinc-200 hover:border-[rgba(212,175,227,0.6)] hover:text-[#d4afe3]"
+                  : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:text-[#d4afe3]"
+              }`}
+            >
+              <span aria-hidden>{theme === "night" ? "☾" : "☀"}</span>
+            </button>
           </div>
           <p className={`max-w-2xl text-base sm:text-lg ${themeStyles.bodyText}`}>
             I'm documenting the experiments that make my creative work feel more intentional—design systems that
@@ -99,7 +155,7 @@ export default function Home() {
           </p>
         </header>
 
-        <section className={`space-y-8 rounded-lg border p-8 transition-colors duration-300 ${themeStyles.surface}`}>
+        <section className={`space-y-8 rounded-md border p-8 transition-colors duration-300 ${themeStyles.surface}`}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.35em] opacity-80" style={{ color: accentColor }}>
@@ -114,11 +170,11 @@ export default function Home() {
             </time>
           </div>
           <p className={`text-base sm:text-lg ${themeStyles.surfaceText}`}>{featuredPost.excerpt}</p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {featuredPost.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-md border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em]"
+                className="rounded-sm border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em]"
                 style={{
                   borderColor: `${accentColor}40`,
                   color: accentColor,
@@ -130,7 +186,7 @@ export default function Home() {
           </div>
           <button
             type="button"
-            className="inline-flex w-max items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300"
+            className="inline-flex w-max items-center gap-2 rounded-sm px-4 py-2 text-sm font-medium transition-colors duration-300"
             style={{
               backgroundColor: accentColor,
               color: theme === "night" ? "#120a17" : "#1f0b2a",
@@ -144,7 +200,7 @@ export default function Home() {
         </section>
 
         <section className="space-y-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xs uppercase tracking-[0.45em]" style={{ color: accentColor }}>
               Recent posts
             </h2>
@@ -156,13 +212,15 @@ export default function Home() {
               View archive →
             </a>
           </div>
-
           <div className="space-y-10">
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
               <article key={post.title} className={`space-y-4 border-b pb-8 last:border-b-0 last:pb-0 ${themeStyles.border}`}>
                 <div className={`flex flex-wrap items-center justify-between gap-2 text-xs ${themeStyles.subtleText}`}>
                   <time dateTime={post.date}>{post.date}</time>
-                  <span>{post.readingTime}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="uppercase tracking-[0.3em]">{post.category}</span>
+                    <span>{post.readingTime}</span>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-2xl font-semibold transition-colors duration-200" style={{ color: accentColor }}>
@@ -179,24 +237,29 @@ export default function Home() {
                 </a>
               </article>
             ))}
+            {filteredPosts.length === 0 && (
+              <p className={`text-sm ${themeStyles.subtleText}`}>
+                No posts found. Try adjusting your search or selecting a different filter.
+              </p>
+            )}
           </div>
         </section>
 
-        <footer className={`rounded-lg border p-8 text-sm transition-colors duration-300 ${themeStyles.surface}`}>
+        <footer className={`rounded-md border p-8 text-sm transition-colors duration-300 ${themeStyles.surface}`}>
           <p className={themeStyles.bodyText}>
             Want notes in your inbox? Join the monthly dispatch and get the behind-the-scenes experiments before they
             ship.
           </p>
           <form className="mt-6 flex flex-col gap-3 sm:flex-row">
             <input
-              className={`h-11 flex-1 rounded-md px-4 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${themeStyles.input}`}
+              className={`h-11 flex-1 rounded-sm px-4 text-sm transition-colors duration-200 ${themeStyles.input}`}
               type="email"
               name="email"
               placeholder="you@example.com"
               aria-label="Email address"
             />
             <button
-              className="h-11 rounded-md px-6 text-sm font-semibold transition-colors duration-300"
+              className="h-11 rounded-sm px-6 text-sm font-semibold transition-colors duration-300"
               style={{
                 backgroundColor: accentColor,
                 color: theme === "night" ? "#120a17" : "#1f0b2a",
