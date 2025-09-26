@@ -1,3 +1,7 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 const featuredPost = {
   title: "Building a mindful writing practice",
   date: "June 2, 2024",
@@ -30,72 +34,147 @@ const posts = [
   },
 ];
 
+const accentColor = "#d4afe3";
+
 export default function Home() {
+  const [theme, setTheme] = useState<"day" | "night">("night");
+
+  const themeStyles = useMemo(
+    () =>
+      theme === "night"
+        ? {
+            page: "bg-[#0b0b0f] text-zinc-100",
+            subtleText: "text-zinc-400",
+            bodyText: "text-zinc-300",
+            surface: "border-white/10 bg-white/5",
+            border: "border-white/10",
+            input: "border-white/15 bg-black/30 text-zinc-100 placeholder:text-zinc-500",
+            surfaceText: "text-zinc-200",
+          }
+        : {
+            page: "bg-[#fdfbff] text-zinc-900",
+            subtleText: "text-zinc-500",
+            bodyText: "text-zinc-600",
+            surface: "border-zinc-200 bg-white",
+            border: "border-zinc-200",
+            input: "border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400",
+            surfaceText: "text-zinc-700",
+          },
+    [theme],
+  );
+
   return (
-    <div className="min-h-screen bg-[#0b0b0f] text-zinc-100">
-      <div className="mx-auto flex max-w-4xl flex-col gap-24 px-6 pb-24 pt-16 sm:px-8 sm:pt-24">
+    <div className={`min-h-screen transition-colors duration-500 ${themeStyles.page}`}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-20 px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
+        <nav className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setTheme((mode) => (mode === "night" ? "day" : "night"))}
+            aria-label="Toggle day and night theme"
+            className={`flex h-10 w-10 items-center justify-center rounded-md border text-base transition-colors duration-300 ${
+              theme === "night"
+                ? "border-white/20 text-zinc-200 hover:border-[rgba(212,175,227,0.6)] hover:text-[#d4afe3]"
+                : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:text-[#d4afe3]"
+            }`}
+          >
+            <span aria-hidden>{theme === "night" ? "☾" : "☀"}</span>
+          </button>
+          <span className="barcode-logo text-2xl uppercase" style={{ color: accentColor }}>
+            D. kline
+          </span>
+        </nav>
+
         <header className="space-y-6">
-          <div className="space-y-3">
-            <span className="text-sm uppercase tracking-[0.45em] text-amber-300">Journal</span>
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+          <div className="space-y-2">
+            <span className="text-xs uppercase tracking-[0.5em] opacity-80" style={{ color: accentColor }}>
+              Journal
+            </span>
+            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
               Writing about craft, curiosity, and the slow web.
             </h1>
           </div>
-          <p className="max-w-2xl text-lg text-zinc-300">
+          <p className={`max-w-2xl text-base sm:text-lg ${themeStyles.bodyText}`}>
             I'm documenting the experiments that make my creative work feel more intentional—design systems that
             breathe, the stacks that keep me curious, and the habits that tether ideas to everyday life.
           </p>
         </header>
 
-        <section className="grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl shadow-amber-500/5 backdrop-blur">
+        <section className={`space-y-8 rounded-lg border p-8 transition-colors duration-300 ${themeStyles.surface}`}>
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-amber-300/80">Featured</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{featuredPost.title}</h2>
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-[0.35em] opacity-80" style={{ color: accentColor }}>
+                Featured
+              </p>
+              <h2 className={`text-2xl font-semibold sm:text-3xl ${theme === "night" ? "text-white" : "text-zinc-900"}`}>
+                {featuredPost.title}
+              </h2>
             </div>
-            <time className="text-sm text-zinc-400" dateTime="2024-06-02">
+            <time className={`text-sm ${themeStyles.subtleText}`} dateTime="2024-06-02">
               {featuredPost.date}
             </time>
           </div>
-          <p className="text-base text-zinc-200 sm:text-lg">{featuredPost.excerpt}</p>
+          <p className={`text-base sm:text-lg ${themeStyles.surfaceText}`}>{featuredPost.excerpt}</p>
           <div className="flex flex-wrap gap-3">
             {featuredPost.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-amber-300/40 bg-amber-300/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] text-amber-200"
+                className="rounded-md border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em]"
+                style={{
+                  borderColor: `${accentColor}40`,
+                  color: accentColor,
+                }}
               >
                 {tag}
               </span>
             ))}
           </div>
-          <button className="inline-flex w-max items-center gap-2 rounded-full border border-amber-400/60 bg-amber-300/20 px-4 py-2 text-sm font-medium text-amber-100 transition hover:bg-amber-300/30">
+          <button
+            type="button"
+            className="inline-flex w-max items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300"
+            style={{
+              backgroundColor: accentColor,
+              color: theme === "night" ? "#120a17" : "#1f0b2a",
+            }}
+          >
             Continue reading
-            <span aria-hidden className="text-lg">→</span>
+            <span aria-hidden className="text-lg">
+              →
+            </span>
           </button>
         </section>
 
-        <section className="space-y-10">
+        <section className="space-y-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm uppercase tracking-[0.35em] text-amber-300">Recent posts</h2>
-            <a className="text-sm font-medium text-amber-200 transition hover:text-amber-100" href="#archive">
+            <h2 className="text-xs uppercase tracking-[0.45em]" style={{ color: accentColor }}>
+              Recent posts
+            </h2>
+            <a
+              className="text-sm font-medium transition-colors duration-200"
+              style={{ color: accentColor }}
+              href="#archive"
+            >
               View archive →
             </a>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-10">
             {posts.map((post) => (
-              <article key={post.title} className="space-y-4 border-b border-white/10 pb-10 last:border-b-0 last:pb-0">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-zinc-400">
+              <article key={post.title} className={`space-y-4 border-b pb-8 last:border-b-0 last:pb-0 ${themeStyles.border}`}>
+                <div className={`flex flex-wrap items-center justify-between gap-2 text-xs ${themeStyles.subtleText}`}>
                   <time dateTime={post.date}>{post.date}</time>
                   <span>{post.readingTime}</span>
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold text-white transition hover:text-amber-200">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-semibold transition-colors duration-200" style={{ color: accentColor }}>
                     <a href="#">{post.title}</a>
                   </h3>
-                  <p className="text-base text-zinc-300 sm:text-lg">{post.excerpt}</p>
+                  <p className={`text-base sm:text-lg ${themeStyles.bodyText}`}>{post.excerpt}</p>
                 </div>
-                <a className="inline-flex items-center gap-2 text-sm font-medium text-amber-200 transition hover:text-amber-100" href="#">
+                <a
+                  className="inline-flex items-center gap-2 text-sm font-medium transition-colors duration-200"
+                  style={{ color: accentColor }}
+                  href="#"
+                >
                   Read story <span aria-hidden className="text-lg">→</span>
                 </a>
               </article>
@@ -103,20 +182,27 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="rounded-3xl border border-white/10 bg-white/5 px-8 py-10 text-sm text-zinc-400 backdrop-blur">
-          <p>
+        <footer className={`rounded-lg border p-8 text-sm transition-colors duration-300 ${themeStyles.surface}`}>
+          <p className={themeStyles.bodyText}>
             Want notes in your inbox? Join the monthly dispatch and get the behind-the-scenes experiments before they
             ship.
           </p>
           <form className="mt-6 flex flex-col gap-3 sm:flex-row">
             <input
-              className="h-11 flex-1 rounded-full border border-white/15 bg-black/20 px-4 text-sm text-white placeholder:text-zinc-500 focus:border-amber-300 focus:outline-none"
+              className={`h-11 flex-1 rounded-md px-4 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${themeStyles.input}`}
               type="email"
               name="email"
               placeholder="you@example.com"
               aria-label="Email address"
             />
-            <button className="h-11 rounded-full bg-amber-300/90 px-6 text-sm font-semibold text-black transition hover:bg-amber-200" type="submit">
+            <button
+              className="h-11 rounded-md px-6 text-sm font-semibold transition-colors duration-300"
+              style={{
+                backgroundColor: accentColor,
+                color: theme === "night" ? "#120a17" : "#1f0b2a",
+              }}
+              type="submit"
+            >
               Subscribe
             </button>
           </form>
