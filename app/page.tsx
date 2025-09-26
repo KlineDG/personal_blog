@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 
 const featuredPost = {
   title: "Building a mindful writing practice",
   date: "June 2, 2024",
   excerpt:
     "How small, consistent rituals can turn writing from a task into a grounding daily habit.",
-  tags: ["Mindset", "Process"],
+  tags: ["Mindful", "Systems"],
 };
 
 const posts = [
@@ -17,7 +17,7 @@ const posts = [
     excerpt:
       "Notes on the tools and structures I'm using to grow a digital space that actually helps ideas mature.",
     readingTime: "6 min read",
-    category: "Design Systems",
+    category: "Design",
   },
   {
     title: "Setting up frictionless blogging with Next.js",
@@ -38,6 +38,7 @@ const posts = [
 ];
 
 const accentColor = "#d4afe3";
+const accentHoverColor = "#e3c4f0";
 
 export default function Home() {
   const [theme, setTheme] = useState<"day" | "night">("night");
@@ -45,6 +46,15 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const accentVariables = useMemo(
+    () =>
+      ({
+        "--accent": accentColor,
+        "--accent-hover": accentHoverColor,
+      }) satisfies CSSProperties,
+    [],
+  );
 
   const categories = useMemo(() => ["All", ...new Set(posts.map((post) => post.category))], []);
 
@@ -88,7 +98,10 @@ export default function Home() {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${themeStyles.page}`}>
+    <div
+      className={`min-h-screen transition-colors duration-500 ${themeStyles.page}`}
+      style={accentVariables}
+    >
       <div className="mx-auto flex max-w-4xl flex-col gap-20 px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
         <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="barcode-logo text-2xl uppercase" style={{ color: accentColor }}>
@@ -121,8 +134,7 @@ export default function Home() {
                 onFocus={() => setIsCategoryMenuOpen(true)}
                 onKeyDown={() => setIsCategoryMenuOpen(true)}
                 placeholder="Search notes"
-                className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
-
+                className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 hover:border-[#d4afe3] focus:border-[#d4afe3] ${themeStyles.input}`}
               />
               {isCategoryMenuOpen && (
                 <div
@@ -132,35 +144,32 @@ export default function Home() {
                 >
                   <p className={`mb-2 text-xs uppercase tracking-[0.35em] ${themeStyles.subtleText}`}>Browse categories</p>
                   <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        role="option"
-                        aria-selected={selectedCategory === category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsCategoryMenuOpen(false);
-                        }}
-                        className="rounded-md border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200"
+                    {categories.map((category) => {
+                      const isSelected = selectedCategory === category;
 
-                        style={
-                          selectedCategory === category
-                            ? {
-                                borderColor: accentColor,
-                                backgroundColor: `${accentColor}1a`,
-                                color: accentColor,
-                              }
-                            : {
-                                borderColor: `${accentColor}40`,
-                                color: theme === "night" ? "#d0c6d6" : "#6b4f7b",
-                              }
-                        }
-                        onFocus={() => setIsCategoryMenuOpen(true)}
-                      >
-                        {category}
-                      </button>
-                    ))}
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          onClick={() => {
+                            setSelectedCategory(category);
+                            setIsCategoryMenuOpen(false);
+                          }}
+                          className={`rounded-full px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
+                            isSelected
+                              ? "bg-[#d4afe3] text-[#1f0b2a]"
+                              : theme === "night"
+                                ? "bg-white/10 text-zinc-200 hover:bg-[rgba(212,175,227,0.25)] hover:text-[#1f0b2a]"
+                                : "bg-[#f1e3f7] text-[#6b4f7b] hover:bg-[rgba(212,175,227,0.35)] hover:text-[#1f0b2a]"
+                          } cursor-pointer`}
+                          onFocus={() => setIsCategoryMenuOpen(true)}
+                        >
+                          {category}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -182,10 +191,10 @@ export default function Home() {
               type="button"
               onClick={() => setTheme((mode) => (mode === "night" ? "day" : "night"))}
               aria-label="Toggle day and night theme"
-              className={`flex h-10 w-10 items-center justify-center rounded-sm border text-base transition-colors duration-300 ${
+              className={`flex h-10 w-10 items-center justify-center rounded-sm border text-base transition-colors duration-300 cursor-pointer ${
                 theme === "night"
-                  ? "border-white/20 text-zinc-200 hover:border-[rgba(212,175,227,0.6)] hover:text-[#d4afe3]"
-                  : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:text-[#d4afe3]"
+                  ? "border-white/20 text-zinc-200 hover:border-[#d4afe3] hover:bg-[rgba(212,175,227,0.18)] hover:text-[#d4afe3]"
+                  : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:bg-[rgba(212,175,227,0.2)] hover:text-[#d4afe3]"
               }`}
             >
               <span aria-hidden>{theme === "night" ? "☾" : "☀"}</span>
@@ -216,11 +225,7 @@ export default function Home() {
             {featuredPost.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-sm border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em]"
-                style={{
-                  borderColor: `${accentColor}40`,
-                  color: accentColor,
-                }}
+                className="rounded-full bg-[rgba(212,175,227,0.18)] px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-[#7c5a99]"
               >
                 {tag}
               </span>
@@ -228,11 +233,7 @@ export default function Home() {
           </div>
           <button
             type="button"
-            className="inline-flex w-max items-center gap-2 rounded-sm px-4 py-2 text-sm font-medium transition-colors duration-300"
-            style={{
-              backgroundColor: accentColor,
-              color: theme === "night" ? "#120a17" : "#1f0b2a",
-            }}
+            className="inline-flex w-max items-center gap-2 rounded-sm bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#1f0b2a] transition-colors duration-300 hover:bg-[var(--accent-hover)] cursor-pointer"
           >
             Continue reading
             <span aria-hidden className="text-lg">
@@ -301,11 +302,7 @@ export default function Home() {
               aria-label="Email address"
             />
             <button
-              className="h-11 rounded-sm px-6 text-sm font-semibold transition-colors duration-300"
-              style={{
-                backgroundColor: accentColor,
-                color: theme === "night" ? "#120a17" : "#1f0b2a",
-              }}
+              className="h-11 rounded-sm bg-[var(--accent)] px-6 text-sm font-semibold text-[#1f0b2a] transition-colors duration-300 hover:bg-[var(--accent-hover)] cursor-pointer"
               type="submit"
             >
               Subscribe
