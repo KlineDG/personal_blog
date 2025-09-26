@@ -122,6 +122,7 @@ export default function Home() {
                 onKeyDown={() => setIsCategoryMenuOpen(true)}
                 placeholder="Search notes"
                 className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
+
               />
               {isCategoryMenuOpen && (
                 <div
@@ -142,6 +143,7 @@ export default function Home() {
                           setIsCategoryMenuOpen(false);
                         }}
                         className="rounded-md border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200"
+
                         style={
                           selectedCategory === category
                             ? {
