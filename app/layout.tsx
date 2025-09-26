@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Libre_Barcode_39_Text } from "next/font/google";
+
+const barcode = Libre_Barcode_39_Text({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-barcode",
+});
 
 export const metadata: Metadata = {
   title: "Personal Blog",
@@ -13,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased transition-colors">
+      <body className={`${barcode.variable} antialiased transition-colors`}>
         {children}
       </body>
     </html>

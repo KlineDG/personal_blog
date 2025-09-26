@@ -104,7 +104,7 @@ export default function Home() {
     >
       <div className="mx-auto flex max-w-4xl flex-col gap-20 px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
         <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <span className="barcode-logo text-2xl uppercase" style={{ color: accentColor }}>
+          <span className="barcode-logo text-4xl uppercase" style={{ color: accentColor }}>
             D. kline
           </span>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
@@ -134,7 +134,7 @@ export default function Home() {
                 onFocus={() => setIsCategoryMenuOpen(true)}
                 onKeyDown={() => setIsCategoryMenuOpen(true)}
                 placeholder="Search notes"
-                className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 hover:border-[#d4afe3] focus:border-[#d4afe3] ${themeStyles.input}`}
+                className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 hover:border-[#d4afe3] focus:border-[#d4afe3] ${themeStyles.input}`}
               />
               {isCategoryMenuOpen && (
                 <div
