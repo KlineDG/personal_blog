@@ -58,7 +58,7 @@ export default function Home() {
             surface: "border-white/15 bg-white/5",
             border: "border-white/10",
             input:
-              "border-white/20 bg-black/30 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
+              "border-b-white/25 bg-black/30 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
             surfaceText: "text-zinc-200",
           }
         : {
@@ -68,7 +68,7 @@ export default function Home() {
             surface: "border-zinc-200 bg-white/90",
             border: "border-zinc-200",
             input:
-              "border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
+              "border-b-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 focus:outline-none",
             surfaceText: "text-zinc-700",
           },
     [theme],
@@ -97,7 +97,7 @@ export default function Home() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <div
               ref={searchContainerRef}
-              className="relative flex w-full min-w-[12rem] items-center gap-2 sm:w-64 sm:justify-end"
+              className="relative flex w-full min-w-[14rem] items-center gap-2 sm:w-80 sm:justify-end"
               onBlur={(event) => {
                 if (
                   searchContainerRef.current &&
@@ -121,7 +121,8 @@ export default function Home() {
                 onFocus={() => setIsCategoryMenuOpen(true)}
                 onKeyDown={() => setIsCategoryMenuOpen(true)}
                 placeholder="Search notes"
-                className={`h-10 w-full rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
+                className={`h-10 w-full rounded-none border-x-0 border-t-0 border-b border-b-[0.5px] px-3 text-sm tracking-wide transition-colors duration-200 ${themeStyles.input}`}
+
               />
               {isCategoryMenuOpen && (
                 <div
@@ -141,7 +142,8 @@ export default function Home() {
                           setSelectedCategory(category);
                           setIsCategoryMenuOpen(false);
                         }}
-                        className="rounded-full border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200"
+                        className="rounded-md border px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200"
+
                         style={
                           selectedCategory === category
                             ? {
