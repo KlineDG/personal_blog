@@ -106,7 +106,7 @@ export function AuthForm({
 
       <div className="space-y-4">
         <h1 className="text-3xl font-semibold tracking-tight">
-          {mode === "signin" ? "Welcome back" : "Create your studio access"}
+          {mode === "signin" ? "Welcome" : "Create your studio access"}
         </h1>
         <p className={tokens.helper}>
           A focused space for capturing experiments, shaping ideas, and checking in with your creative pulse.

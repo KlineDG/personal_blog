@@ -69,7 +69,6 @@ export function AuthShell({
       </header>
       <div className="flex flex-1 items-center justify-center px-6 pb-20 pt-12 sm:px-10">
         <div className={`w-full max-w-lg rounded-md ${tokens.panel} px-8 py-12 sm:px-12`}>
-          <div className={`mb-10 text-xs uppercase tracking-[0.45em] ${tokens.subtle}`}>Access</div>
           {children}
         </div>
       </div>
