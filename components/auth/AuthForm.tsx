@@ -26,7 +26,6 @@ type AuthFormProps = {
 
 type ThemeTokens = {
   readonly field: string;
-  readonly label: string;
   readonly submit: string;
   readonly outline: string;
   readonly ghost: string;
@@ -34,13 +33,14 @@ type ThemeTokens = {
   readonly error: string;
   readonly info: string;
   readonly spinner: string;
+  readonly form: string;
+  readonly helper: string;
 };
 
 const themeTokens: Record<AuthTheme, ThemeTokens> = {
   night: {
     field:
-      "border border-white/12 bg-[rgba(10,10,16,0.82)] px-4 py-3 text-sm text-zinc-100 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/40 placeholder:text-zinc-500",
-    label: "text-[10px] uppercase tracking-[0.4em] text-zinc-500",
+      "w-full rounded-md border border-white/12 bg-[rgba(10,10,16,0.82)] px-4 py-3 text-sm text-zinc-100 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/40 placeholder:text-zinc-500",
     submit:
       "flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[var(--accent)] px-4 text-sm font-semibold text-[#120813] transition hover:bg-[#e6d4f0] disabled:cursor-wait disabled:opacity-70",
     outline:
@@ -52,11 +52,13 @@ const themeTokens: Record<AuthTheme, ThemeTokens> = {
     error: "rounded-sm border border-red-500/60 bg-red-500/10 px-4 py-3 text-sm text-red-100",
     info: "rounded-sm border border-[var(--accent)]/40 bg-[rgba(212,175,227,0.14)] px-4 py-3 text-sm text-zinc-100",
     spinner: "border-zinc-900/20",
+    form:
+      "space-y-5 rounded-lg border border-white/10 bg-[rgba(8,8,14,0.75)] p-6 pt-7 sm:p-8",
+    helper: "text-sm text-zinc-400",
   },
   day: {
     field:
-      "border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/30 placeholder:text-zinc-400",
-    label: "text-[10px] uppercase tracking-[0.4em] text-zinc-500",
+      "w-full rounded-md border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 transition focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/30 placeholder:text-zinc-400",
     submit:
       "flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[var(--accent)] px-4 text-sm font-semibold text-[#1f0b2a] transition hover:bg-[#e7d8f1] disabled:cursor-wait disabled:opacity-70",
     outline:
@@ -68,6 +70,9 @@ const themeTokens: Record<AuthTheme, ThemeTokens> = {
     error: "rounded-sm border border-red-500/60 bg-red-500/10 px-4 py-3 text-sm text-red-600",
     info: "rounded-sm border border-[var(--accent)]/40 bg-[rgba(212,175,227,0.12)] px-4 py-3 text-sm text-zinc-700",
     spinner: "border-zinc-100/40",
+    form:
+      "space-y-5 rounded-lg border border-zinc-200 bg-white p-6 pt-7 shadow-[0_16px_40px_-35px_rgba(24,16,32,0.35)] sm:p-8",
+    helper: "text-sm text-zinc-500",
   },
 };
 
@@ -85,9 +90,10 @@ export function AuthForm({
   onGuestAccess,
 }: AuthFormProps) {
   const tokens = themeTokens[theme];
+  const listBorderClass = theme === "day" ? "border-zinc-200" : "border-white/15";
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       {!supabaseReady && (
         <div className={tokens.supabase}>
           Supply NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth.
@@ -98,11 +104,25 @@ export function AuthForm({
 
       {info && <div className={tokens.info}>{info}</div>}
 
-      <form className="space-y-5" onSubmit={onSubmit} noValidate>
+      <div className="space-y-4">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          {mode === "signin" ? "Welcome back" : "Create your studio access"}
+        </h1>
+        <p className={tokens.helper}>
+          A focused space for capturing experiments, shaping ideas, and checking in with your creative pulse.
+        </p>
+        <ul
+          className={`grid gap-3 rounded-md border border-dashed p-4 text-sm sm:grid-cols-2 ${tokens.helper} ${listBorderClass}`}
+        >
+          <li>Weekly progress postcards</li>
+          <li>Private lab notes archive</li>
+          <li>Micro-prompts to stay inspired</li>
+          <li>Guest mode for quick peeks</li>
+        </ul>
+      </div>
+
+      <form className={tokens.form} onSubmit={onSubmit} noValidate>
         <div className="space-y-2">
-          <label className={tokens.label} htmlFor="email">
-            Email
-          </label>
           <input
             id="email"
             type="email"
@@ -110,15 +130,13 @@ export function AuthForm({
             value={form.email}
             onChange={onFieldChange("email")}
             className={tokens.field}
-            placeholder="you@example.com"
+            placeholder="Email"
+            aria-label="Email"
             autoComplete="email"
           />
         </div>
 
         <div className="space-y-2">
-          <label className={tokens.label} htmlFor="password">
-            Password
-          </label>
           <input
             id="password"
             type="password"
@@ -126,7 +144,8 @@ export function AuthForm({
             value={form.password}
             onChange={onFieldChange("password")}
             className={tokens.field}
-            placeholder="••••••••"
+            placeholder="Password"
+            aria-label="Password"
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             minLength={6}
           />
@@ -134,9 +153,6 @@ export function AuthForm({
 
         {mode === "signup" && (
           <div className="space-y-2">
-            <label className={tokens.label} htmlFor="confirmPassword">
-              Confirm password
-            </label>
             <input
               id="confirmPassword"
               type="password"
@@ -144,7 +160,8 @@ export function AuthForm({
               value={form.confirmPassword}
               onChange={onFieldChange("confirmPassword")}
               className={tokens.field}
-              placeholder="Repeat your password"
+              placeholder="Confirm password"
+              aria-label="Confirm password"
               autoComplete="new-password"
               minLength={6}
             />
