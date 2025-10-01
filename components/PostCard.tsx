@@ -1,4 +1,16 @@
-import type { PostCardPost } from "@/lib/posts";
+export type PostCardPost = {
+  readonly title: string;
+  readonly slug: string;
+  readonly excerpt?: string | null;
+  readonly summary?: string | null;
+  readonly category?: string | null;
+  readonly tags?: readonly string[] | null;
+  readonly readingTime?: string | null;
+  readonly reading_time?: string | null;
+  readonly publishedAt?: string | null;
+  readonly isoDate?: string | null;
+  readonly dateLabel?: string | null;
+};
 
 const BookmarkIcon = ({
   filled = false,
@@ -48,8 +60,20 @@ export function PostCard({
   variant = "default",
 }: PostCardProps) {
   const TitleTag = (variant === "featured" ? "h2" : "h3") as const;
+  const isoDate = post.isoDate ?? (post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined);
+  const dateLabel =
+    post.dateLabel ??
+    (post.publishedAt
+      ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
+      : undefined);
+  const excerpt = post.excerpt ?? post.summary ?? "";
 
   const containerPadding = variant === "featured" ? "p-8" : "p-6";
+  const readingTime = post.readingTime ?? post.reading_time ?? null;
   const headingSize =
     variant === "featured"
       ? "text-3xl font-semibold sm:text-4xl"
@@ -63,14 +87,14 @@ export function PostCard({
         variant === "featured" ? themeStyles.surface : themeStyles.border
       } ${containerPadding} hover:border-[var(--accent)]`}
     >
-      {(post.category || post.readingTime) && (
+      {(post.category || readingTime) && (
         <div
           className={`flex flex-wrap items-center gap-3 text-xs ${themeStyles.subtleText}`}
         >
           {post.category && (
             <span className="uppercase tracking-[0.3em]">{post.category}</span>
           )}
-          {post.readingTime && <span>{post.readingTime}</span>}
+          {readingTime && <span>{readingTime}</span>}
         </div>
       )}
 
@@ -89,13 +113,14 @@ export function PostCard({
           } `}
         >
           <a
-            href={post.slug ? `/posts/${post.slug}` : "#"}
+
+            href={`/posts/${post.slug}`}
             className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
           >
             {post.title}
           </a>
         </TitleTag>
-        <p className={`text-base sm:text-lg ${excerptColor}`}>{post.excerpt}</p>
+        {excerpt && <p className={`text-base sm:text-lg ${excerptColor}`}>{excerpt}</p>}
       </div>
 
       {post.tags?.length ? (
@@ -118,7 +143,8 @@ export function PostCard({
       <div
         className={`mt-6 flex items-center justify-between text-xs ${themeStyles.subtleText}`}
       >
-        <time dateTime={post.isoDate || undefined}>{post.date}</time>
+
+        {dateLabel && isoDate && <time dateTime={isoDate}>{dateLabel}</time>}
         <button
           type="button"
           aria-label={`Save ${post.title}`}
