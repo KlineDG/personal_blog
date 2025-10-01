@@ -388,9 +388,9 @@ export default function DraftsSidebar() {
   return (
     <div className="flex h-full flex-col gap-5">
       <div
-        className="flex flex-1 flex-col overflow-hidden rounded-xl border border-[var(--editor-border)] bg-[var(--editor-surface)] shadow-[var(--editor-shadow)]"
+        className="flex flex-1 flex-col overflow-hidden border-none border-[var(--editor-border)]  shadow-[var(--editor-shadow)]"
       >
-        <div className="flex items-center justify-between border-b border-[var(--editor-subtle-border)] px-3 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
+        <div className="flex items-center justify-between border-none border-[var(--editor-subtle-border)] px-3 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
           <span>Workspace</span>
           <div className="flex items-center gap-1">
              <button
@@ -429,7 +429,7 @@ export default function DraftsSidebar() {
           </ul>
         </nav>
       </div>
-      <div className="border border-dashed border-[var(--editor-border)] px-2 py-2">
+      <div className="">
         <label className="sr-only" htmlFor="draft-search">
           Search drafts
         </label>

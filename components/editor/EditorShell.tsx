@@ -84,12 +84,6 @@ export default function EditorShell({ sidebar, children }: EditorShellProps) {
             style={{ backgroundColor: "var(--editor-sidebar-bg)" }}
           >
             <div className="flex-1 overflow-y-auto px-2 py-6 sm:px-3">{sidebar}</div>
-            <div
-              className="border-t border-[var(--editor-subtle-border)] px-4 py-5"
-              style={{ backgroundColor: "var(--editor-account-bg)" }}
-            >
-              <AccountPanel />
-            </div>
           </aside>
           <main className="flex-1 overflow-y-auto px-10 py-10">
             <div className="mx-auto w-full max-w-4xl space-y-8 pb-24">{children}</div>
