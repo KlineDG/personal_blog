@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSONContent } from "@tiptap/core";
+import { useParams, useRouter } from "next/navigation";
+
 
 import Editor from "@/components/editor/Editor";
 import SaveIndicator from "@/components/editor/SaveIndicator";
@@ -62,9 +64,11 @@ export default function WriteSlugPage() {
 
       const { data, error } = await supabase
         .from("posts")
+
         .select("id,title,content_json,status,published_at")
         .eq("slug", slug)
         .maybeSingle<DraftRecord>();
+
 
       if (error) {
         alert(error.message);
@@ -76,6 +80,7 @@ export default function WriteSlugPage() {
         router.replace("/write");
         return;
       }
+
 
       if (!active) return;
       setPostId(data.id);
@@ -96,11 +101,12 @@ export default function WriteSlugPage() {
 
     setSaving("saving");
     const timeout = setTimeout(async () => {
+
       const { error } = await supabase
         .from("posts")
         .update({ title, content_json: content })
         .eq("id", postId);
-
+      
       if (error) {
         setSaving("error");
         return;
@@ -155,7 +161,7 @@ export default function WriteSlugPage() {
       .update({ status: "published", published_at: new Date().toISOString() })
       .eq("id", postId);
 
-    setIsPublishing(false);
+
     if (error) {
       alert(error.message);
       return;
@@ -177,13 +183,14 @@ export default function WriteSlugPage() {
       .update({ status: "draft", published_at: null })
       .eq("id", postId);
 
-    setIsPublishing(false);
+
     if (error) {
       alert(error.message);
       return;
     }
 
     setStatus("draft");
+
     setPublishedAt(null);
     notifyDrafts("editor:refresh-drafts");
     setFeedback("Unpublished. The draft is private again.");
@@ -219,6 +226,7 @@ export default function WriteSlugPage() {
             <button
               type="button"
               onClick={saveVersion}
+
               className="rounded-md border border-[var(--editor-border)] px-3 py-2 uppercase tracking-[0.28em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
               Save snapshot
