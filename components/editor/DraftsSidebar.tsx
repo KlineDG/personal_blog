@@ -163,7 +163,7 @@ function TreeNodeItem({
                 event.stopPropagation();
                 onCreateFolder(node.id);
               }}
-              className="flex h-7 w-7 items-center justify-center rounded border border-[var(--editor-border)] text-[0.7rem] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              className="flex h-7 w-7 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-[0.7rem] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
               <span aria-hidden>📁+</span>
               <span className="sr-only">Create folder inside {node.name}</span>
@@ -174,7 +174,7 @@ function TreeNodeItem({
                 event.stopPropagation();
                 onCreateFile(node.id);
               }}
-              className="flex h-7 w-7 items-center justify-center rounded border border-[var(--editor-border)] text-[0.7rem] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              className="flex h-7 w-7 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-[0.7rem] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
               <span aria-hidden>📄+</span>
               <span className="sr-only">Create file inside {node.name}</span>
@@ -385,58 +385,9 @@ export default function DraftsSidebar() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col gap-5">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
-            Drafts
-          </h2>
-          <Link
-            href="/write"
-            className="rounded-md bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#1f0b2a] shadow-[0_12px_24px_-18px_rgba(212,175,227,0.8)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-          >
-            New
-          </Link>
-        </div>
-        <div className="relative">
-          <label className="sr-only" htmlFor="draft-search">
-            Search drafts
-          </label>
-          <input
-            id="draft-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search drafts"
-            className="w-full border-0 border-b border-[var(--editor-border)] bg-transparent px-1 py-2 text-sm text-[color:var(--editor-page-text)] placeholder:text-[color:var(--editor-muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-0"
-            type="search"
-          />
-        </div>
-      </div>
-      <div
-        className="flex flex-1 flex-col overflow-hidden rounded-xl border border-[var(--editor-border)] bg-[var(--editor-surface)] shadow-[var(--editor-shadow)]"
-      >
-        <div className="flex items-center justify-between border-b border-[var(--editor-subtle-border)] px-3 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
-          <span>Workspace</span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => handleCreateFolder(null)}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-[var(--editor-border)] text-xs transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <span aria-hidden>🗂+</span>
-              <span className="sr-only">Create folder</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCreateFile(null)}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-[var(--editor-border)] text-xs transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <span aria-hidden>📄+</span>
-              <span className="sr-only">Create file</span>
-            </button>
-          </div>
-        </div>
-        <nav className="flex-1 overflow-y-auto px-1 py-3">
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex-1 overflow-hidden border border-dashed border-[var(--editor-border)]">
+        <nav className="h-full overflow-y-auto px-2 py-3">
           <ul className="space-y-1 text-sm">
             {workspaceTree.map((node) => (
               <TreeNodeItem
@@ -453,6 +404,19 @@ export default function DraftsSidebar() {
             ))}
           </ul>
         </nav>
+      </div>
+      <div className="border border-dashed border-[var(--editor-border)] px-2 py-2">
+        <label className="sr-only" htmlFor="draft-search">
+          Search drafts
+        </label>
+        <input
+          id="draft-search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search drafts"
+          className="w-full border border-dashed border-[var(--editor-border)] bg-transparent px-2 py-2 text-sm text-[color:var(--editor-page-text)] placeholder:text-[color:var(--editor-muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-0"
+          type="search"
+        />
       </div>
     </div>
   );

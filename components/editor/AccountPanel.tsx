@@ -17,6 +17,7 @@ export function AccountPanel() {
   const { accentColor } = useEditorTheme();
   const [account, setAccount] = useState<AccountSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -61,26 +62,52 @@ export function AccountPanel() {
   return (
     <div className="space-y-4 text-sm text-[color:var(--editor-muted)]">
       <div className="flex items-center justify-between gap-3">
-        <Link
-          href="/account"
-          className="group relative flex h-11 w-11 items-center justify-center rounded-full text-base font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-          style={{
-            backgroundColor: "var(--editor-soft)",
-            color: "var(--editor-page-text)",
-            boxShadow: "var(--editor-shadow)",
+        <div
+          className="relative"
+          onMouseEnter={() => setShowDetails(true)}
+          onMouseLeave={() => setShowDetails(false)}
+          onFocusCapture={() => setShowDetails(true)}
+          onBlurCapture={(event) => {
+            const next = event.relatedTarget as Node | null;
+            if (!next || !event.currentTarget.contains(next)) {
+              setShowDetails(false);
+            }
           }}
         >
-          <span aria-hidden>{initials}</span>
-          <span className="pointer-events-none absolute left-full top-1/2 z-10 ml-3 min-w-[12rem] -translate-y-1/2 rounded-md border border-[var(--editor-border)] bg-[var(--editor-surface)] px-3 py-2 text-left text-xs font-medium text-[color:var(--editor-page-text)] opacity-0 shadow-[var(--editor-shadow)] transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-            <span className="block text-sm font-semibold">{accountName}</span>
-            {accountEmail && <span className="mt-1 block text-[0.7rem] text-[color:var(--editor-muted)]">{accountEmail}</span>}
-          </span>
-          <span className="sr-only">Open account</span>
-        </Link>
+          <button
+            type="button"
+            className="group flex h-11 w-11 items-center justify-center rounded-full text-base font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            onClick={() => setShowDetails((prev) => !prev)}
+            style={{
+              backgroundColor: "var(--editor-soft)",
+              color: "var(--editor-page-text)",
+              boxShadow: "var(--editor-shadow)",
+            }}
+            aria-expanded={showDetails}
+            aria-haspopup="dialog"
+          >
+            <span aria-hidden>{initials}</span>
+            <span className="sr-only">View account details</span>
+          </button>
+          {showDetails && (
+            <div className="absolute left-full top-1/2 z-10 ml-3 min-w-[12rem] -translate-y-1/2 select-text border border-dashed border-[var(--editor-border)] bg-[var(--editor-surface)] px-3 py-2 text-left text-xs text-[color:var(--editor-page-text)] shadow-none">
+              <span className="block text-sm font-semibold">{accountName}</span>
+              {accountEmail && (
+                <span className="mt-1 block text-[0.7rem] text-[color:var(--editor-muted)]">{accountEmail}</span>
+              )}
+              <Link
+                href="/account"
+                className="mt-3 inline-flex items-center border border-dashed border-[var(--editor-border)] px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              >
+                Manage
+              </Link>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <Link
             href="/settings"
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            className="flex h-9 w-9 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
           >
             <span aria-hidden>⚙</span>
             <span className="sr-only">Open settings</span>
@@ -88,7 +115,7 @@ export function AccountPanel() {
           <button
             type="button"
             onClick={handleSignOut}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            className="flex h-9 w-9 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             style={{ color: accentColor }}
           >
             <span aria-hidden>⎋</span>
