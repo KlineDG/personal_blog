@@ -56,7 +56,7 @@ export default function EditorShell({ sidebar, children }: EditorShellProps) {
       >
         <header
           className="border-b border-[var(--editor-border)] px-8 py-6 backdrop-blur"
-          style={{ backgroundColor: "var(--editor-nav-bg)" }}
+          style={{ backgroundColor: "var(--editor-sidebar-bg)" }}
         >
           <div className="flex flex-wrap items-center justify-between gap-6">
             <Link
@@ -80,10 +80,10 @@ export default function EditorShell({ sidebar, children }: EditorShellProps) {
         </header>
         <div className="flex flex-1 overflow-hidden">
           <aside
-            className="flex w-80 min-w-[18rem] flex-col border-r border-[var(--editor-border)]"
+            className="flex w-64 min-w-[15rem] flex-col border-r border-[var(--editor-border)]"
             style={{ backgroundColor: "var(--editor-sidebar-bg)" }}
           >
-            <div className="flex-1 overflow-y-auto px-2 py-6">{sidebar}</div>
+            <div className="flex-1 overflow-y-auto px-2 py-6 sm:px-3">{sidebar}</div>
             <div
               className="border-t border-[var(--editor-subtle-border)] px-4 py-5"
               style={{ backgroundColor: "var(--editor-account-bg)" }}
