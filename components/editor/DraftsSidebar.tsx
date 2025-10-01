@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+import { FilePlus, FolderPlus } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -192,6 +194,7 @@ function TreeNodeItem({
 export default function DraftsSidebar() {
   const supabase = useMemo(() => createClient(), []);
   const pathname = usePathname();
+  const router = useRouter();
   const { accentColor } = useEditorTheme();
   const [drafts, setDrafts] = useState<readonly DraftSummary[]>([]);
   const [query, setQuery] = useState("");
@@ -200,6 +203,47 @@ export default function DraftsSidebar() {
   const [folders, setFolders] = useState<readonly FolderSummary[]>([]);
   const [foldersLoading, setFoldersLoading] = useState(true);
   const [foldersError, setFoldersError] = useState<string | null>(null);
+  const [canManageWorkspace, setCanManageWorkspace] = useState(false);
+  const [checkingOwner, setCheckingOwner] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data: auth } = await supabase.auth.getUser();
+        if (!active) return;
+        const user = auth.user;
+        if (!user) {
+          setCanManageWorkspace(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("blog_owner")
+          .select("owner_id")
+          .eq("owner_id", user.id)
+          .maybeSingle();
+
+        if (!active) return;
+        if (error) {
+          setCanManageWorkspace(false);
+        } else {
+          setCanManageWorkspace(Boolean(data));
+        }
+      } catch (error) {
+        if (!active) return;
+        console.error("Unable to verify workspace permissions", error);
+        setCanManageWorkspace(false);
+      } finally {
+        if (!active) return;
+        setCheckingOwner(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [supabase]);
 
   const fetchDrafts = useMemo(
     () =>
@@ -469,6 +513,106 @@ export default function DraftsSidebar() {
     [supabase],
   );
 
+  const handleCreateFolder = useCallback(async () => {
+    if (!canManageWorkspace) {
+      return;
+    }
+
+    const name = window.prompt("Folder name");
+    const trimmed = name?.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const { data: auth } = await supabase.auth.getUser();
+    const user = auth.user;
+    if (!user) {
+      window.alert("Sign in to create folders.");
+      return;
+    }
+
+    const slugBase = trimmed
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-{2,}/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const slug = `${slugBase || "folder"}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const { data, error } = await supabase
+      .from("folders")
+      .insert({
+        owner_id: user.id,
+        name: trimmed,
+        slug,
+      })
+      .select("id,name")
+      .single();
+
+    if (error) {
+      window.alert(`Unable to create folder: ${error.message}`);
+      return;
+    }
+
+    if (!data) {
+      return;
+    }
+
+    const insertedFolder: FolderSummary = { id: data.id, name: data.name };
+
+    setFolders((prev) =>
+      [...prev, insertedFolder].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })),
+    );
+    setExpandedFolders((prev) => (prev.includes(insertedFolder.id) ? prev : [...prev, insertedFolder.id]));
+  }, [canManageWorkspace, supabase]);
+
+  const handleCreateDraft = useCallback(async () => {
+    if (!canManageWorkspace) {
+      return;
+    }
+
+    const { data: auth } = await supabase.auth.getUser();
+    const user = auth.user;
+    if (!user) {
+      window.alert("Sign in to create drafts.");
+      return;
+    }
+
+    const title = "Untitled";
+    const slug = `untitled-${Math.random().toString(36).slice(2, 8)}`;
+
+    const { data, error } = await supabase
+      .from("posts")
+      .insert({
+        author_id: user.id,
+        title,
+        slug,
+        status: "draft",
+        content_json: { type: "doc", content: [{ type: "paragraph" }] },
+      })
+      .select("id,title,slug,updated_at,folder_id")
+      .single();
+
+    if (error) {
+      window.alert(`Unable to create draft: ${error.message}`);
+      return;
+    }
+
+    if (!data) {
+      return;
+    }
+
+    const newDraft: DraftSummary = {
+      id: data.id,
+      title: data.title,
+      slug: data.slug,
+      updated_at: data.updated_at,
+      folder_id: data.folder_id,
+    };
+
+    setDrafts((prev) => [newDraft, ...prev]);
+    router.push(`/write/${data.slug}`);
+  }, [canManageWorkspace, router, supabase]);
+
   return (
     <div className="flex h-full flex-col gap-5">
       <div
@@ -476,6 +620,28 @@ export default function DraftsSidebar() {
       >
         <div className="flex items-center justify-between border-none border-[var(--editor-subtle-border)] px-3 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)] transition-colors hover:bg-[var(--editor-soft)] hover:text-[color:var(--editor-page-text)]">
           <span>Workspace</span>
+          {canManageWorkspace && !checkingOwner && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleCreateFolder}
+                className="flex h-8 w-8 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                title="New folder"
+                aria-label="Create new folder"
+              >
+                <FolderPlus className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateDraft}
+                className="flex h-8 w-8 items-center justify-center rounded-sm border border-dashed border-[var(--editor-border)] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                title="New draft"
+                aria-label="Create new draft"
+              >
+                <FilePlus className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          )}
         </div>
         <nav className="flex-1 overflow-y-auto px-1 py-3">
           <ul className="space-y-1 text-sm">
