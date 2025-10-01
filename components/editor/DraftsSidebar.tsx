@@ -4,97 +4,145 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useEditorTheme } from "@/components/editor/EditorShell";
 import { createClient } from "@/lib/supabase/client";
 
-type Draft = {
+import { useEditorTheme } from "./EditorShell";
+
+type DraftSummary = {
   readonly id: string;
   readonly title: string | null;
   readonly slug: string;
-  readonly updated_at: string;
+  readonly updated_at: string | null;
 };
+
+type DraftEventDetail = {
+  readonly id: string;
+  readonly title?: string;
+  readonly slug?: string;
+};
+
+const toTitle = (title: string | null) => (title && title.trim().length > 0 ? title : "Untitled draft");
 
 export default function DraftsSidebar() {
   const supabase = useMemo(() => createClient(), []);
-  const [drafts, setDrafts] = useState<readonly Draft[]>([]);
-  const [query, setQuery] = useState("");
-  const { tokens } = useEditorTheme();
   const pathname = usePathname();
+  const { accentColor } = useEditorTheme();
+  const [drafts, setDrafts] = useState<readonly DraftSummary[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchDrafts = useMemo(
+    () =>
+      async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("posts")
+          .select("id,title,slug,updated_at")
+          .eq("status", "draft")
+          .eq("is_deleted", false)
+          .order("updated_at", { ascending: false })
+          .limit(100);
+        if (!error) {
+          setDrafts(data ?? []);
+        }
+        setLoading(false);
+      },
+    [supabase],
+  );
 
   useEffect(() => {
-    void (async () => {
-      const { data } = await supabase
-        .from("posts")
-        .select("id,title,slug,updated_at")
-        .eq("status", "draft")
-        .eq("is_deleted", false)
-        .order("updated_at", { ascending: false })
-        .limit(50);
+    fetchDrafts();
+  }, [fetchDrafts]);
 
-      setDrafts(data ?? []);
-    })();
-  }, [supabase]);
+  useEffect(() => {
+    const onRefresh = () => fetchDrafts();
+    const onDraftUpdated: EventListener = (event) => {
+      const detail = (event as CustomEvent<DraftEventDetail>).detail;
+      if (!detail) return;
+      setDrafts((prev) =>
+        prev.map((draft) => (draft.id === detail.id ? { ...draft, ...detail } : draft)),
+      );
+    };
 
-  const filteredDrafts = useMemo(
-    () =>
-      drafts.filter((draft) =>
-        (draft.title ?? "Untitled").toLowerCase().includes(query.trim().toLowerCase()),
-      ),
-    [drafts, query],
+    window.addEventListener("editor:refresh-drafts", onRefresh);
+    window.addEventListener("editor:draft-updated", onDraftUpdated);
+    return () => {
+      window.removeEventListener("editor:refresh-drafts", onRefresh);
+      window.removeEventListener("editor:draft-updated", onDraftUpdated);
+    };
+  }, [fetchDrafts]);
+
+  const filteredDrafts = drafts.filter((draft) =>
+    toTitle(draft.title).toLowerCase().includes(query.trim().toLowerCase()),
   );
 
   return (
     <div className="flex h-full flex-col gap-6">
-      <div className={`rounded-md px-4 py-5 shadow-sm transition-colors duration-300 ${tokens.surface}`}>
-        <div className="flex flex-col gap-3">
+      <div className="space-y-4 rounded-xl border border-[var(--editor-border)] px-4 py-5 shadow-[var(--editor-shadow)]" style={{ backgroundColor: "var(--editor-surface)" }}>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.4em] text-[color:var(--editor-muted)]">
+            Drafts
+          </h2>
           <Link
             href="/write"
-            className={`inline-flex items-center justify-center rounded-sm px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.35em] transition-colors duration-200 ${tokens.buttonPrimary}`}
+            className="rounded-md bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#1f0b2a] shadow-[0_12px_24px_-18px_rgba(212,175,227,0.8)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
           >
-            New Post
+            New
           </Link>
-          <label className="flex flex-col gap-2 text-xs font-medium uppercase tracking-[0.35em]">
-            <span className={tokens.sidebarHeading}>Search drafts</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Filter by title"
-              className={`h-10 rounded-sm border px-3 text-sm tracking-wide transition-colors duration-200 ${tokens.input}`}
-              type="search"
-            />
-          </label>
         </div>
+        <label className="block text-[0.7rem] uppercase tracking-[0.3em] text-[color:var(--editor-muted)]">
+          <span className="sr-only">Search drafts</span>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search drafts"
+            className="mt-2 w-full rounded-md border border-[var(--editor-input-border)] bg-[var(--editor-input-bg)] px-3 py-2 text-[0.8rem] text-[color:var(--editor-page-text)] placeholder:text-[color:var(--editor-muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-40"
+            type="search"
+          />
+        </label>
       </div>
-
-      <div className={`flex-1 overflow-y-auto rounded-md border px-2 py-3 transition-colors duration-300 ${tokens.surface}`}>
-        <div className="space-y-2">
+      <nav className="flex-1 overflow-y-auto pr-2">
+        <ul className="space-y-2">
+          {loading && (
+            <li className="rounded-lg border border-[var(--editor-border)] bg-[var(--editor-soft)] px-4 py-3 text-xs text-[color:var(--editor-muted)]">
+              Loading drafts…
+            </li>
+          )}
+          {!loading && filteredDrafts.length === 0 && (
+            <li className="rounded-lg border border-[var(--editor-border)] bg-[var(--editor-soft)] px-4 py-3 text-xs text-[color:var(--editor-muted)]">
+              No drafts yet. Start something new.
+            </li>
+          )}
           {filteredDrafts.map((draft) => {
-            const isActive = pathname?.startsWith(`/write/${draft.slug}`) ?? false;
-
+            const isActive = pathname?.includes(`/write/${draft.slug}`);
+            const updatedLabel = draft.updated_at
+              ? new Date(draft.updated_at).toLocaleString()
+              : "Never saved";
             return (
-              <Link
-                key={draft.id}
-                href={`/write/${draft.slug}`}
-                className={`block rounded-sm px-3 py-2 text-left text-sm transition-colors duration-200 ${
-                  isActive ? tokens.sidebarItemActive : tokens.sidebarItem
-                }`}
-              >
-                <div className="flex flex-col">
-                  <span className="truncate font-medium">
-                    {draft.title && draft.title.trim().length > 0 ? draft.title : "Untitled"}
-                  </span>
-                  <span className={`text-xs ${tokens.muted}`}>
-                    {new Date(draft.updated_at).toLocaleString()}
-                  </span>
-                </div>
-              </Link>
+              <li key={draft.id}>
+                <Link
+                  href={`/write/${draft.slug}`}
+                  className="group block rounded-xl border border-[var(--editor-border)] px-4 py-3 transition-colors hover:border-[var(--accent)]"
+                  style={
+                    isActive
+                      ? {
+                          borderColor: accentColor,
+                          backgroundColor: "var(--editor-soft)",
+                          color: accentColor,
+                        }
+                      : undefined
+                  }
+                >
+                  <p className="truncate text-sm font-semibold text-[color:var(--editor-page-text)] group-hover:text-[var(--accent)]" style={isActive ? { color: accentColor } : undefined}>
+                    {toTitle(draft.title)}
+                  </p>
+                  <p className="mt-1 text-xs text-[color:var(--editor-muted)]">{updatedLabel}</p>
+                </Link>
+              </li>
             );
           })}
-        </div>
-        {filteredDrafts.length === 0 && (
-          <p className={`mt-6 text-center text-sm ${tokens.muted}`}>No drafts yet.</p>
-        )}
-      </div>
+        </ul>
+      </nav>
     </div>
   );
 }
