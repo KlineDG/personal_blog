@@ -21,6 +21,64 @@ type FormState = {
 
 const accentColor = "#d4afe3";
 
+const placeholderAdjectives = [
+  "curious",
+  "lunar",
+  "quiet",
+  "radiant",
+  "stellar",
+  "velvet",
+  "wild",
+  "woven",
+] as const;
+
+const placeholderNouns = [
+  "artisan",
+  "cartographer",
+  "dreamer",
+  "gardener",
+  "scribe",
+  "sojourner",
+  "storyteller",
+  "tinkerer",
+] as const;
+
+const placeholderFocus = [
+  "slow web experiments",
+  "intentional workflows",
+  "everyday rituals",
+  "curiosity loops",
+  "digital gardens",
+  "quiet design",
+] as const;
+
+function capitalize(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+function sample<T>(values: readonly T[]): T {
+  return values[Math.floor(Math.random() * values.length)];
+}
+
+function createPlaceholderProfile(id: string) {
+  const adjective = sample(placeholderAdjectives);
+  const noun = sample(placeholderNouns);
+  const focus = sample(placeholderFocus);
+  const condensedId = id.replace(/-/g, "").slice(0, 6);
+  const randomSuffix = Math.random().toString(36).slice(2, 6);
+  const baseUsername = `${adjective}_${noun}`.toLowerCase();
+  const username = `${baseUsername}_${condensedId}${randomSuffix}`.slice(0, 40);
+  const displayName = `${capitalize(adjective)} ${capitalize(noun)}`;
+  const avatarSeed = `${displayName}-${condensedId}`;
+
+  return {
+    username,
+    display_name: displayName,
+    avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(avatarSeed)}`,
+    bio: `Exploring ${focus} as a ${displayName.toLowerCase()} in progress.`,
+  } as const;
+}
+
 function persistSession(session: SupabaseSession) {
   if (typeof window === "undefined") {
     return;
@@ -128,9 +186,11 @@ export default function AuthGateway() {
         throw new Error("Unable to resolve the new user's identifier.");
       }
 
+      const placeholderProfile = createPlaceholderProfile(profileId);
+
       await upsertProfile(session.access_token, {
         id: profileId,
-        email: user?.email ?? form.email,
+        ...placeholderProfile,
       });
 
       persistSession(session);
