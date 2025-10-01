@@ -10,7 +10,7 @@ export default async function WriteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
