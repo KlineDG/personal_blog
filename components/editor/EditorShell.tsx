@@ -61,7 +61,7 @@ export default function EditorShell({ sidebar, children }: EditorShellProps) {
           <div className="flex flex-wrap items-center justify-between gap-6">
             <Link
               href="/home"
-              className="barcode-logo text-4xl uppercase tracking-[0.4em] transition-colors hover:text-[var(--accent)]"
+              className="barcode-logo text-4xl uppercase transition-colors hover:text-[var(--accent)]"
               style={{ color: accentColor }}
             >
               D. kline
