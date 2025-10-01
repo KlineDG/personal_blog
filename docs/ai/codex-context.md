@@ -43,3 +43,40 @@
 ## Common Errors
 - 401/403: Likely RLS—ensure `author_id = auth.uid()` and target post is published for non-owner actions.
 - Draft access by non-owner is blocked by design.
+
+## Folders (for editor sidebar)
+
+**Purpose:** Owner organizes drafts/posts into folders. Readers never see folders.
+
+### Table
+- `folders`:
+  - `id uuid pk`
+  - `owner_id uuid` → `profiles.id` (must equal site owner)
+  - `name text` (1–80 chars)
+  - `slug text` (unique per owner)
+  - `description text`
+  - `sort_order int` (for manual ordering)
+  - timestamps
+
+### Relationship
+- `posts.folder_id uuid` → `folders.id` (ON DELETE SET NULL)
+- A post belongs to **0 or 1** folder.
+
+### RLS (plain English)
+- Only the **blog owner** can `SELECT/INSERT/UPDATE/DELETE` folders.
+- Posts already enforce owner-only writes; setting `folder_id` is allowed for the owner.
+
+### Query patterns
+- Create: insert `{ owner_id: auth.uid(), name, slug }`.
+- Move post: update post’s `folder_id`.
+- Sidebar: list `folders` with `folder_post_counts` view for badge counts.
+- “Unfiled” drafts = `posts.folder_id is null`.
+
+### Constraints
+- `(owner_id, slug)` is unique → safe renaming if you update slug.
+- `sort_order` controls the sidebar ordering; fallback to `created_at` desc.
+
+### UI notes
+- “New Folder” uses the “FolderPlus” icon (lucide-react).
+- Show badges: drafts/published from `folder_post_counts`.
+- Allow drag to reorder → update `sort_order`.
