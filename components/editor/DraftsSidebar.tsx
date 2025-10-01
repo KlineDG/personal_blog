@@ -387,32 +387,6 @@ export default function DraftsSidebar() {
 
   return (
     <div className="flex h-full flex-col gap-5">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
-            Drafts
-          </h2>
-          <Link
-            href="/write"
-            className="rounded-md bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#1f0b2a] shadow-[0_12px_24px_-18px_rgba(212,175,227,0.8)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-          >
-            New
-          </Link>
-        </div>
-        <div className="relative">
-          <label className="sr-only" htmlFor="draft-search">
-            Search drafts
-          </label>
-          <input
-            id="draft-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search drafts"
-            className="w-full border-0 border-b border-[var(--editor-border)] bg-transparent px-1 py-2 text-sm text-[color:var(--editor-page-text)] placeholder:text-[color:var(--editor-muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-0"
-            type="search"
-          />
-        </div>
-      </div>
       <div
         className="flex flex-1 flex-col overflow-hidden rounded-xl border border-[var(--editor-border)] bg-[var(--editor-surface)] shadow-[var(--editor-shadow)]"
       >
