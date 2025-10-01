@@ -22,7 +22,7 @@ type PostPageProps = {
 };
 
 export default async function PostPage({ params }: PostPageProps) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("posts")
     .select("title,slug,content_json,published_at,excerpt,summary")
