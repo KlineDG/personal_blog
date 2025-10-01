@@ -1,3 +1,4 @@
+
 import HomeClient from "./HomeClient";
 import { createClient } from "@/lib/supabase/server";
 

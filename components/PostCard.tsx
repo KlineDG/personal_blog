@@ -113,6 +113,7 @@ export function PostCard({
           } `}
         >
           <a
+
             href={`/posts/${post.slug}`}
             className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
           >
@@ -142,6 +143,7 @@ export function PostCard({
       <div
         className={`mt-6 flex items-center justify-between text-xs ${themeStyles.subtleText}`}
       >
+
         {dateLabel && isoDate && <time dateTime={isoDate}>{dateLabel}</time>}
         <button
           type="button"
