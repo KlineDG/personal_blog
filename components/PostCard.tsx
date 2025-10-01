@@ -1,4 +1,4 @@
-import type { Post } from "../data/posts";
+import type { PostCardPost } from "@/lib/posts";
 
 const BookmarkIcon = ({
   filled = false,
@@ -35,7 +35,7 @@ export type PostCardTheme = {
 };
 
 type PostCardProps = {
-  post: Post;
+  post: PostCardPost;
   theme: "day" | "night";
   themeStyles: PostCardTheme;
   variant?: "default" | "featured";
@@ -89,7 +89,7 @@ export function PostCard({
           } `}
         >
           <a
-            href="#"
+            href={post.slug ? `/posts/${post.slug}` : "#"}
             className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
           >
             {post.title}
@@ -118,7 +118,7 @@ export function PostCard({
       <div
         className={`mt-6 flex items-center justify-between text-xs ${themeStyles.subtleText}`}
       >
-        <time dateTime={post.isoDate}>{post.date}</time>
+        <time dateTime={post.isoDate || undefined}>{post.date}</time>
         <button
           type="button"
           aria-label={`Save ${post.title}`}
