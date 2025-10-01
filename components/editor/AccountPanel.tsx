@@ -55,47 +55,46 @@ export function AccountPanel() {
     window.location.href = "/";
   };
 
+  const accountName = loading ? "Loading account…" : account?.name || "Guest";
+  const accountEmail = loading ? "" : account?.email ?? "";
+
   return (
     <div className="space-y-4 text-sm text-[color:var(--editor-muted)]">
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 items-center justify-center rounded-full text-base font-semibold"
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/account"
+          className="group relative flex h-11 w-11 items-center justify-center rounded-full text-base font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
           style={{
             backgroundColor: "var(--editor-soft)",
             color: "var(--editor-page-text)",
             boxShadow: "var(--editor-shadow)",
           }}
         >
-          {initials}
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-[color:var(--editor-page-text)]">
-            {loading ? "Loading account…" : account?.name || "Guest"}
-          </p>
-          {account?.email && <p className="truncate text-xs">{account.email}</p>}
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 text-xs font-medium uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
-        <Link
-          href="/settings"
-          className="rounded-md border border-[var(--editor-border)] px-3 py-2 text-center transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-        >
-          Settings
+          <span aria-hidden>{initials}</span>
+          <span className="pointer-events-none absolute left-full top-1/2 z-10 ml-3 min-w-[12rem] -translate-y-1/2 rounded-md border border-[var(--editor-border)] bg-[var(--editor-surface)] px-3 py-2 text-left text-xs font-medium text-[color:var(--editor-page-text)] opacity-0 shadow-[var(--editor-shadow)] transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="block text-sm font-semibold">{accountName}</span>
+            {accountEmail && <span className="mt-1 block text-[0.7rem] text-[color:var(--editor-muted)]">{accountEmail}</span>}
+          </span>
+          <span className="sr-only">Open account</span>
         </Link>
-        <Link
-          href="/account"
-          className="rounded-md border border-[var(--editor-border)] px-3 py-2 text-center transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-        >
-          Account
-        </Link>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="rounded-md border border-[var(--editor-border)] px-3 py-2 text-center transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-          style={{ color: accentColor }}
-        >
-          Sign out
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+          >
+            <span aria-hidden>⚙</span>
+            <span className="sr-only">Open settings</span>
+          </Link>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--editor-border)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            style={{ color: accentColor }}
+          >
+            <span aria-hidden>⎋</span>
+            <span className="sr-only">Sign out</span>
+          </button>
+        </div>
       </div>
     </div>
   );
