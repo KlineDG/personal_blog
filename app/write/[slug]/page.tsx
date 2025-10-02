@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 
 import Editor from "@/components/editor/Editor";
-import SaveIndicator from "@/components/editor/SaveIndicator";
 import { useEditorTheme } from "@/components/editor/EditorShell";
 import Toolbar from "@/components/editor/Toolbar";
 import { createClient } from "@/lib/supabase/client";
@@ -282,9 +281,9 @@ export default function WriteSlugPage() {
         </>
       )}
       <nav
-        className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-4xl -translate-x-1/2 justify-center px-5 py-4"
+        className="fixed bottom-0 left-0 right-0 z-20 flex justify-center px-5 py-4 lg:left-64 lg:px-10"
       >
-        <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex w-full max-w-4xl flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:gap-6">
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
             <span className="inline-flex items-center gap-2">
               <Link2 className="h-3.5 w-3.5" aria-hidden />
@@ -340,9 +339,7 @@ export default function WriteSlugPage() {
               </button>
             )}
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] sm:justify-end">
-            <span>{characterCount.toLocaleString()} characters</span>
-            <SaveIndicator state={saving} />
+          <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] sm:ml-auto sm:justify-end">
             {saving === "saving" && (
               <span
                 className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${
@@ -359,6 +356,7 @@ export default function WriteSlugPage() {
                 {statusText}
               </span>
             )}
+            <span>{characterCount.toLocaleString()} characters</span>
           </div>
         </div>
         {feedback && (
