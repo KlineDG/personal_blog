@@ -4,23 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSONContent } from "@tiptap/core";
 import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  CheckCircle2,
-  Clock3,
-  FilePenLine,
-  Link2,
-  Rocket,
-  Save,
-  Sparkles,
-  Undo2,
-} from "lucide-react";
+import { Clock3, Link2, Rocket, Save, Sparkles, Undo2 } from "lucide-react";
 
 import Editor from "@/components/editor/Editor";
 import { useEditorTheme } from "@/components/editor/EditorShell";
 import Toolbar from "@/components/editor/Toolbar";
 import { createClient } from "@/lib/supabase/client";
-
-type SaveState = "idle" | "saving" | "saved" | "error";
 
 type PostStatus = "draft" | "published";
 
@@ -30,11 +19,6 @@ type DraftRecord = {
   readonly content_json: JSONContent | null;
   readonly status: PostStatus;
   readonly published_at: string | null;
-};
-
-const statusLabels: Record<PostStatus, string> = {
-  draft: "Draft",
-  published: "Published",
 };
 
 const notifyDrafts = (event: string, detail?: unknown) => {
@@ -56,7 +40,6 @@ export default function WriteSlugPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<JSONContent | null>(null);
   const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
-  const [saving, setSaving] = useState<SaveState>("idle");
   const [status, setStatus] = useState<PostStatus>("draft");
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -110,27 +93,22 @@ export default function WriteSlugPage() {
     if (!postId) return;
     if (content == null) return;
 
-    setSaving("saving");
     const { error } = await supabase
       .from("posts")
       .update({ title, content_json: content })
       .eq("id", postId);
 
     if (error) {
-      setSaving("error");
       return;
     }
 
-    setSaving("saved");
     notifyDrafts("editor:draft-updated", { id: postId, title, slug });
-    setTimeout(() => setSaving("idle"), 1200);
   }, [content, postId, slug, supabase, title]);
 
   useEffect(() => {
     if (!postId) return;
     if (content == null) return;
 
-    setSaving("saving");
     const timeout = setTimeout(() => {
       void pushDraftUpdate();
     }, 1200);
@@ -222,7 +200,6 @@ export default function WriteSlugPage() {
   }, [postId, supabase]);
 
   const isPublished = status === "published";
-  const statusText = statusLabels[status];
   const publishedLabel =
     publishedAt && isPublished
       ? new Date(publishedAt).toLocaleString()
@@ -245,7 +222,7 @@ export default function WriteSlugPage() {
                 placeholder="Post title"
                 className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
               />
-              <div className="mt-2 flex items-center gap-2 text-xs text-[color:var(--editor-muted)]">
+              <div className="mt-3 flex items-center gap-2 text-xs text-[color:var(--editor-muted)]">
                 <Link2 className="h-3 w-3" aria-hidden />
                 <span className="truncate" title={slug}>
                   {slug}
@@ -289,8 +266,8 @@ export default function WriteSlugPage() {
       <nav
         className="fixed bottom-0 left-0 right-0 z-20 flex justify-center px-5 py-4 lg:left-64 lg:px-10"
       >
-        <div className="flex w-full max-w-4xl flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:gap-6">
-          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
+        <div className="flex w-full max-w-4xl flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-around sm:gap-4 lg:gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
             <span>{characterCount.toLocaleString()} characters</span>
             {isPublished && (
               <a
@@ -302,30 +279,32 @@ export default function WriteSlugPage() {
               </a>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={saveSnapshot}
-              disabled={!canSaveDraft}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <Sparkles className="h-4 w-4" aria-hidden />
-              Snapshot
-            </button>
-            <button
-              type="button"
-              onClick={handleManualSave}
-              disabled={!canSaveDraft}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <Save className="h-4 w-4" aria-hidden />
-              Save draft
-            </button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={saveSnapshot}
+                disabled={!canSaveDraft}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-3 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              >
+                <Sparkles className="h-4 w-4" aria-hidden />
+                Snapshot
+              </button>
+              <button
+                type="button"
+                onClick={handleManualSave}
+                disabled={!canSaveDraft}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              >
+                <Save className="h-4 w-4" aria-hidden />
+                Save draft
+              </button>
+            </div>
             <button
               type="button"
               onClick={publish}
               disabled={isPublishing || isPublished}
-              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
               <Rocket className="h-4 w-4" aria-hidden />
               Publish
@@ -335,29 +314,11 @@ export default function WriteSlugPage() {
                 type="button"
                 onClick={unpublish}
                 disabled={isPublishing}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
               >
                 <Undo2 className="h-4 w-4" aria-hidden />
                 Unpublish
               </button>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] sm:ml-auto sm:justify-end">
-            {saving === "saving" && (
-              <span
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${
-                  isPublished
-                    ? "border-[var(--accent)] text-[color:var(--accent)]"
-                    : "border-[var(--editor-border)] text-[color:var(--editor-muted)]"
-                }`}
-              >
-                {isPublished ? (
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-                ) : (
-                  <FilePenLine className="h-3.5 w-3.5" aria-hidden />
-                )}
-                {statusText}
-              </span>
             )}
           </div>
         </div>
