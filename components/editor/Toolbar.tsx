@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRef, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { Editor } from "@tiptap/react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -37,6 +37,25 @@ export default function Toolbar({
 }: ToolbarProps) {
   const supabase = createClient();
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const [, setRenderCount] = useState(0);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const forceUpdate = () => setRenderCount((count) => count + 1);
+
+    editor.on("transaction", forceUpdate);
+    editor.on("selectionUpdate", forceUpdate);
+    editor.on("focus", forceUpdate);
+    editor.on("blur", forceUpdate);
+
+    return () => {
+      editor.off("transaction", forceUpdate);
+      editor.off("selectionUpdate", forceUpdate);
+      editor.off("focus", forceUpdate);
+      editor.off("blur", forceUpdate);
+    };
+  }, [editor]);
 
   if (!editor) return null;
 
