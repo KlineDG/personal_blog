@@ -60,10 +60,10 @@ export default function Toolbar({
       aria-pressed={active}
       aria-label={label}
       title={label}
-      className={`group rounded-md border border-[var(--editor-toolbar-border)] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
+      className={`group flex items-center justify-center rounded-md border border-[var(--editor-toolbar-border)] px-3 py-2 text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
         orientation === "vertical"
-          ? "flex h-10 w-full items-center justify-center"
-          : "flex h-10 w-10 items-center justify-center"
+          ? "w-12"
+          : "min-w-[2.75rem]"
       }`}
       style={{
         borderColor: active ? accent : "var(--editor-toolbar-border)",
@@ -102,8 +102,8 @@ export default function Toolbar({
     <div
       className={
         orientation === "vertical"
-          ? "flex flex-col gap-2"
-          : "flex flex-wrap items-center gap-2"
+          ? "flex flex-col items-center gap-2"
+          : "flex flex-wrap items-center justify-center gap-2"
       }
     >
       {button({

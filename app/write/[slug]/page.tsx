@@ -268,7 +268,7 @@ export default function WriteSlugPage() {
       {editorInstance && (
         <>
           <div className="pointer-events-none">
-            <div className="pointer-events-auto fixed right-6 top-1/3 z-30 hidden xl:flex">
+            <div className="pointer-events-auto fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 xl:flex">
               <Toolbar editor={editorInstance} accent={accentColor} orientation="vertical" />
             </div>
           </div>
@@ -284,29 +284,29 @@ export default function WriteSlugPage() {
           <span>{characterCount.toLocaleString()} characters</span>
           <div className="flex flex-wrap items-center justify-end gap-3">
             <SaveIndicator state={saving} />
-            <span
-              className="inline-flex items-center gap-2 rounded-full border px-3 py-1"
-              style={
-                isPublished
-                  ? { borderColor: accentColor, color: accentColor }
-                  : undefined
-              }
-            >
-              {isPublished ? (
-                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-              ) : (
-                <FilePenLine className="h-3.5 w-3.5" aria-hidden />
-              )}
-              {statusText}
-            </span>
+            {saving === "saving" && (
+              <span
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${
+                  isPublished
+                    ? "border-[var(--accent)] text-[color:var(--accent)]"
+                    : "border-[var(--editor-border)] text-[color:var(--editor-muted)]"
+                }`}
+              >
+                {isPublished ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                ) : (
+                  <FilePenLine className="h-3.5 w-3.5" aria-hidden />
+                )}
+                {statusText}
+              </span>
+            )}
           </div>
         </div>
       </div>
       <nav
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--editor-border)] px-5 py-4 backdrop-blur"
-        style={{ backgroundColor: "var(--editor-nav-bg)" }}
+        className="fixed bottom-0 left-1/2 z-20 w-full max-w-4xl -translate-x-1/2 border-t border-[var(--editor-border)] bg-[color:var(--editor-nav-bg)] px-5 py-4 backdrop-blur"
       >
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
             <span className="inline-flex items-center gap-2">
               <Link2 className="h-3.5 w-3.5" aria-hidden />
