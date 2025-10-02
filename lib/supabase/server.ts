@@ -1,4 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
+// lib/supabase/server.ts
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export const createClient = async () => {
@@ -9,14 +10,23 @@ export const createClient = async () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        async get(name: string) {
+        get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options });
+        set(name: string, value: string, options: CookieOptions) {
+          // Allowed only in Server Actions / Route Handlers.
+          try {
+            cookieStore.set(name, value, options);
+          } catch {
+            // ignore when called in a Server Component render
+          }
         },
-        remove(name: string, options: any) {
-          cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set(name, "", { ...options, maxAge: 0 });
+          } catch {
+            // ignore when called in a Server Component render
+          }
         },
       },
     }

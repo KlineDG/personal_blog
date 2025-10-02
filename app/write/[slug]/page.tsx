@@ -136,6 +136,10 @@ export default function WriteSlugPage() {
     return () => clearTimeout(timeout);
   }, [content, postId, pushDraftUpdate]);
 
+    const handleManualSave = useCallback(async () => {
+    await pushDraftUpdate();
+  }, [pushDraftUpdate]);
+
   useEffect(() => {
     const onKey = async (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
@@ -214,10 +218,6 @@ export default function WriteSlugPage() {
     setTimeout(() => setFeedback(null), 3200);
     setIsPublishing(false);
   }, [postId, supabase]);
-
-  const handleManualSave = useCallback(async () => {
-    await pushDraftUpdate();
-  }, [pushDraftUpdate]);
 
   const isPublished = status === "published";
   const statusText = statusLabels[status];
