@@ -58,7 +58,13 @@ export default function Toolbar({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`group flex items-center gap-2 rounded-md border border-[var(--editor-toolbar-border)] bg-transparent text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:bg-[var(--editor-soft)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${orientation === "vertical" ? "w-full px-3 py-2" : "px-3 py-2"}`}
+      aria-label={label}
+      title={label}
+      className={`group rounded-md border border-[var(--editor-toolbar-border)] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
+        orientation === "vertical"
+          ? "flex h-10 w-full items-center gap-2 px-3"
+          : "flex h-10 w-10 items-center justify-center"
+      }`}
       style={{
         borderColor: active ? accent : "var(--editor-toolbar-border)",
         color: active ? accent : undefined,
@@ -67,10 +73,10 @@ export default function Toolbar({
       }}
     >
       <Icon className="h-4 w-4" aria-hidden />
-      {orientation === "vertical" ? (
-        <span className="text-[10px] tracking-[0.3em]">{label}</span>
-      ) : (
-        <span className="sr-only">{label}</span>
+      {orientation === "vertical" && (
+        <span className="text-[10px] font-semibold uppercase tracking-[0.3em]">
+          {label}
+        </span>
       )}
     </button>
   );
