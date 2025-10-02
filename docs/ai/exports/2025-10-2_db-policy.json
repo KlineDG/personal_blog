@@ -517,7 +517,7 @@
             "udt_name": "text",
             "data_type": "text",
             "is_identity": "NO",
-            "is_nullable": "NO",
+            "is_nullable": "YES",
             "is_generated": "NEVER",
             "generated_expr": null,
             "identity_generation": null
