@@ -281,34 +281,10 @@ export default function WriteSlugPage() {
           </div>
         </>
       )}
-      <div className="fixed bottom-24 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[var(--editor-border)] bg-[color:var(--editor-nav-bg)] px-4 py-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
-          <span>{characterCount.toLocaleString()} characters</span>
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            <SaveIndicator state={saving} />
-            {saving === "saving" && (
-              <span
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${
-                  isPublished
-                    ? "border-[var(--accent)] text-[color:var(--accent)]"
-                    : "border-[var(--editor-border)] text-[color:var(--editor-muted)]"
-                }`}
-              >
-                {isPublished ? (
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-                ) : (
-                  <FilePenLine className="h-3.5 w-3.5" aria-hidden />
-                )}
-                {statusText}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
       <nav
-        className="fixed bottom-0 left-1/2 z-20 w-full max-w-4xl -translate-x-1/2 border-t border-[var(--editor-border)] bg-[color:var(--editor-nav-bg)] px-5 py-4 backdrop-blur"
+        className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-4xl -translate-x-1/2 justify-center px-5 py-4"
       >
-        <div className="mx-auto flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
             <span className="inline-flex items-center gap-2">
               <Link2 className="h-3.5 w-3.5" aria-hidden />
@@ -362,6 +338,26 @@ export default function WriteSlugPage() {
                 <Undo2 className="h-4 w-4" aria-hidden />
                 Unpublish
               </button>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] sm:justify-end">
+            <span>{characterCount.toLocaleString()} characters</span>
+            <SaveIndicator state={saving} />
+            {saving === "saving" && (
+              <span
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${
+                  isPublished
+                    ? "border-[var(--accent)] text-[color:var(--accent)]"
+                    : "border-[var(--editor-border)] text-[color:var(--editor-muted)]"
+                }`}
+              >
+                {isPublished ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                ) : (
+                  <FilePenLine className="h-3.5 w-3.5" aria-hidden />
+                )}
+                {statusText}
+              </span>
             )}
           </div>
         </div>
