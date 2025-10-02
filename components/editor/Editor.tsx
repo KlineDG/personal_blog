@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import type { Editor as TiptapEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -39,8 +39,30 @@ export default function Editor({ initial, onChange, onReady, onCharacterCountCha
     },
   });
 
+  const lastInitial = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!editor || !initial) return;
+    if (!editor) return;
+
+    if (initial == null) {
+      lastInitial.current = null;
+      return;
+    }
+
+    const nextInitial = JSON.stringify(initial);
+
+    if (lastInitial.current === nextInitial) {
+      return;
+    }
+
+    lastInitial.current = nextInitial;
+
+    const currentContent = JSON.stringify(editor.getJSON());
+
+    if (currentContent === nextInitial) {
+      return;
+    }
+
     editor.commands.setContent(initial, false);
     onCharacterCountChange?.(editor.storage.characterCount.characters());
   }, [editor, initial, onCharacterCountChange]);
