@@ -239,13 +239,19 @@ export default function WriteSlugPage() {
                 Post title
               </label>
               <input
-              id="post-title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Post title"
-              className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
-            />
-          </div>
+                id="post-title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="Post title"
+                className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
+              />
+              <div className="mt-2 flex items-center gap-2 text-xs text-[color:var(--editor-muted)]">
+                <Link2 className="h-3 w-3" aria-hidden />
+                <span className="truncate" title={slug}>
+                  {slug}
+                </span>
+              </div>
+            </div>
             <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
               {publishedLabel && (
                 <span className="inline-flex items-center gap-2 normal-case tracking-normal">
@@ -285,10 +291,7 @@ export default function WriteSlugPage() {
       >
         <div className="flex w-full max-w-4xl flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:gap-6">
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
-            <span className="inline-flex items-center gap-2">
-              <Link2 className="h-3.5 w-3.5" aria-hidden />
-              {slug}
-            </span>
+            <span>{characterCount.toLocaleString()} characters</span>
             {isPublished && (
               <a
                 href={`/posts/${slug}`}
@@ -356,7 +359,6 @@ export default function WriteSlugPage() {
                 {statusText}
               </span>
             )}
-            <span>{characterCount.toLocaleString()} characters</span>
           </div>
         </div>
         {feedback && (
