@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSONContent } from "@tiptap/core";
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useParams, useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Clock3,
   FilePenLine,
-  FileText,
   Link2,
   Rocket,
   Save,
@@ -18,6 +18,7 @@ import {
 import Editor from "@/components/editor/Editor";
 import SaveIndicator from "@/components/editor/SaveIndicator";
 import { useEditorTheme } from "@/components/editor/EditorShell";
+import Toolbar from "@/components/editor/Toolbar";
 import { createClient } from "@/lib/supabase/client";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -55,6 +56,7 @@ export default function WriteSlugPage() {
   const [postId, setPostId] = useState<string>("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<JSONContent | null>(null);
+  const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
   const [saving, setSaving] = useState<SaveState>("idle");
   const [status, setStatus] = useState<PostStatus>("draft");
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
@@ -136,7 +138,7 @@ export default function WriteSlugPage() {
     return () => clearTimeout(timeout);
   }, [content, postId, pushDraftUpdate]);
 
-    const handleManualSave = useCallback(async () => {
+  const handleManualSave = useCallback(async () => {
     await pushDraftUpdate();
   }, [pushDraftUpdate]);
 
@@ -234,22 +236,17 @@ export default function WriteSlugPage() {
         style={{ backgroundColor: "var(--editor-nav-bg)" }}
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--editor-border)] text-[color:var(--editor-muted)]">
-              <FileText className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0 flex-1">
-              <label htmlFor="post-title" className="sr-only">
-                Post title
-              </label>
-              <input
-                id="post-title"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="Post title"
-                className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
-              />
-            </div>
+          <div className="min-w-0 flex-1">
+            <label htmlFor="post-title" className="sr-only">
+              Post title
+            </label>
+            <input
+              id="post-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Post title"
+              className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
+            />
           </div>
           <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
             <span
@@ -276,7 +273,7 @@ export default function WriteSlugPage() {
           </div>
         </div>
       </div>
-      <Editor initial={content} onChange={setContent} />
+      <Editor initial={content} onChange={setContent} onReady={setEditorInstance} />
       <div className="space-y-4 rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-surface)] px-5 py-6 shadow-[var(--editor-shadow)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--editor-muted)]">
@@ -294,46 +291,51 @@ export default function WriteSlugPage() {
               </a>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <SaveIndicator state={saving} />
-            <button
-              type="button"
-              onClick={handleManualSave}
-              disabled={!canSaveDraft}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <Save className="h-4 w-4" aria-hidden />
-              Save draft
-            </button>
-            <button
-              type="button"
-              onClick={publish}
-              disabled={isPublishing || isPublished}
-              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <Rocket className="h-4 w-4" aria-hidden />
-              Publish
-            </button>
-            {isPublished && (
+          <div className="flex flex-col gap-3 text-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <Toolbar editor={editorInstance} accent={accentColor} />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <SaveIndicator state={saving} />
               <button
                 type="button"
-                onClick={unpublish}
-                disabled={isPublishing}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                onClick={handleManualSave}
+                disabled={!canSaveDraft}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
               >
-                <Undo2 className="h-4 w-4" aria-hidden />
-                Unpublish
+                <Save className="h-4 w-4" aria-hidden />
+                Save draft
               </button>
-            )}
-            <button
-              type="button"
-              onClick={saveSnapshot}
-              disabled={!canSaveDraft}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <Sparkles className="h-4 w-4" aria-hidden />
-              Snapshot
-            </button>
+              <button
+                type="button"
+                onClick={publish}
+                disabled={isPublishing || isPublished}
+                className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              >
+                <Rocket className="h-4 w-4" aria-hidden />
+                Publish
+              </button>
+              {isPublished && (
+                <button
+                  type="button"
+                  onClick={unpublish}
+                  disabled={isPublishing}
+                  className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                >
+                  <Undo2 className="h-4 w-4" aria-hidden />
+                  Unpublish
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={saveSnapshot}
+                disabled={!canSaveDraft}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              >
+                <Sparkles className="h-4 w-4" aria-hidden />
+                Snapshot
+              </button>
+            </div>
           </div>
         </div>
         {feedback && (
