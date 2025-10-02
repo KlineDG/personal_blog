@@ -247,21 +247,6 @@ export default function WriteSlugPage() {
             />
           </div>
           <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
-            <span
-              className="inline-flex items-center gap-2 rounded-full border px-3 py-1"
-              style={
-                isPublished
-                  ? { borderColor: accentColor, color: accentColor }
-                  : undefined
-              }
-            >
-              {isPublished ? (
-                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-              ) : (
-                <FilePenLine className="h-3.5 w-3.5" aria-hidden />
-              )}
-              {statusText}
-            </span>
             {publishedLabel && (
               <span className="inline-flex items-center gap-2 normal-case tracking-normal">
                 <Clock3 className="h-3.5 w-3.5" aria-hidden />
@@ -297,11 +282,28 @@ export default function WriteSlugPage() {
       <div className="mx-auto w-full max-w-4xl px-5">
         <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] opacity-70">
           <span>{characterCount.toLocaleString()} characters</span>
-          <SaveIndicator state={saving} />
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <SaveIndicator state={saving} />
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1"
+              style={
+                isPublished
+                  ? { borderColor: accentColor, color: accentColor }
+                  : undefined
+              }
+            >
+              {isPublished ? (
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+              ) : (
+                <FilePenLine className="h-3.5 w-3.5" aria-hidden />
+              )}
+              {statusText}
+            </span>
+          </div>
         </div>
       </div>
       <nav
-        className="sticky bottom-0 z-20 border-t border-[var(--editor-border)] px-5 py-4 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--editor-border)] px-5 py-4 backdrop-blur"
         style={{ backgroundColor: "var(--editor-nav-bg)" }}
       >
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
