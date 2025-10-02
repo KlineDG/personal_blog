@@ -5,7 +5,6 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import History from '@tiptap/extension-history';
 import CharacterCount from '@tiptap/extension-character-count';
 import TextAlign from '@tiptap/extension-text-align';
 import type { JSONContent } from '@tiptap/core';
@@ -23,9 +22,9 @@ type EditorProps = {
 export default function Editor({ initial, onChange }: EditorProps) {
   const { accentColor } = useEditorTheme();
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
-      History,
       Link.configure({ openOnClick: true, autolink: true }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
       CharacterCount,
