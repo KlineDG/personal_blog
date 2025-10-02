@@ -17,9 +17,10 @@ type EditorProps = {
   readonly initial: JSONContent | null;
   readonly onChange: (json: JSONContent) => void;
   readonly onReady?: (editor: TiptapEditor | null) => void;
+  readonly onCharacterCountChange?: (count: number) => void;
 };
 
-export default function Editor({ initial, onChange, onReady }: EditorProps) {
+export default function Editor({ initial, onChange, onReady, onCharacterCountChange }: EditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -34,31 +35,29 @@ export default function Editor({ initial, onChange, onReady }: EditorProps) {
     autofocus: false,
     onUpdate({ editor }) {
       onChange(editor.getJSON());
+      onCharacterCountChange?.(editor.storage.characterCount.characters());
     },
   });
 
   useEffect(() => {
     if (!editor || !initial) return;
     editor.commands.setContent(initial, false);
-  }, [editor, initial]);
+    onCharacterCountChange?.(editor.storage.characterCount.characters());
+  }, [editor, initial, onCharacterCountChange]);
 
   useEffect(() => {
     onReady?.(editor ?? null);
+    if (editor) {
+      onCharacterCountChange?.(editor.storage.characterCount.characters());
+    }
     return () => {
       onReady?.(null);
     };
-  }, [editor, onReady]);
-
-  const characterCount = editor ? editor.storage.characterCount.characters() : 0;
+  }, [editor, onCharacterCountChange, onReady]);
 
   return (
-    <div className="space-y-6">
-      <div className="mx-auto w-full max-w-3xl">
-        <EditorContent editor={editor} className="tiptap" />
-      </div>
-      <div className="text-xs text-[color:var(--editor-muted)]">
-        {characterCount} characters
-      </div>
+    <div className="mx-auto w-full max-w-3xl">
+      <EditorContent editor={editor} className="tiptap" />
     </div>
   );
 }

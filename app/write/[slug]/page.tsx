@@ -62,6 +62,7 @@ export default function WriteSlugPage() {
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [characterCount, setCharacterCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -230,11 +231,8 @@ export default function WriteSlugPage() {
   const canSaveDraft = Boolean(postId && content);
 
   return (
-    <div className="space-y-8">
-      <div
-        className="sticky top-0 z-10 space-y-3 rounded-2xl border border-[var(--editor-border)] px-5 py-5 shadow-[var(--editor-shadow)] backdrop-blur"
-        style={{ backgroundColor: "var(--editor-nav-bg)" }}
-      >
+    <div className="space-y-8 pb-32">
+      <div className="sticky top-0 z-10 space-y-3 px-5 py-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 flex-1">
             <label htmlFor="post-title" className="sr-only">
@@ -273,77 +271,102 @@ export default function WriteSlugPage() {
           </div>
         </div>
       </div>
-      <Editor initial={content} onChange={setContent} onReady={setEditorInstance} />
-      <div className="space-y-4 rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-surface)] px-5 py-6 shadow-[var(--editor-shadow)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--editor-muted)]">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--editor-subtle-border)] px-3 py-1">
+      <Editor
+        initial={content}
+        onChange={setContent}
+        onReady={(instance) => {
+          setEditorInstance(instance);
+          setCharacterCount(instance?.storage.characterCount.characters() ?? 0);
+        }}
+        onCharacterCountChange={setCharacterCount}
+      />
+      {editorInstance && (
+        <>
+          <div className="pointer-events-none">
+            <div className="pointer-events-auto fixed right-6 top-1/3 z-30 hidden xl:flex">
+              <Toolbar editor={editorInstance} accent={accentColor} orientation="vertical" />
+            </div>
+          </div>
+          <div className="mx-auto w-full max-w-4xl px-5 xl:hidden">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Toolbar editor={editorInstance} accent={accentColor} />
+            </div>
+          </div>
+        </>
+      )}
+      <div className="mx-auto w-full max-w-4xl px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] opacity-70">
+          <span>{characterCount.toLocaleString()} characters</span>
+          <SaveIndicator state={saving} />
+        </div>
+      </div>
+      <nav
+        className="sticky bottom-0 z-20 border-t border-[var(--editor-border)] px-5 py-4 backdrop-blur"
+        style={{ backgroundColor: "var(--editor-nav-bg)" }}
+      >
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
+            <span className="inline-flex items-center gap-2">
               <Link2 className="h-3.5 w-3.5" aria-hidden />
               {slug}
             </span>
             {isPublished && (
               <a
                 href={`/posts/${slug}`}
-                className="inline-flex items-center gap-2 uppercase tracking-[0.28em] text-[color:var(--accent)] transition-colors hover:text-[var(--accent)]/80"
+                className="inline-flex items-center gap-2 text-[color:var(--accent)] transition-colors hover:text-[var(--accent)]/80"
               >
                 View live
                 <Rocket className="h-3.5 w-3.5" aria-hidden />
               </a>
             )}
           </div>
-          <div className="flex flex-col gap-3 text-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <Toolbar editor={editorInstance} accent={accentColor} />
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <SaveIndicator state={saving} />
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={saveSnapshot}
+              disabled={!canSaveDraft}
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            >
+              <Sparkles className="h-4 w-4" aria-hidden />
+              Snapshot
+            </button>
+            <button
+              type="button"
+              onClick={handleManualSave}
+              disabled={!canSaveDraft}
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            >
+              <Save className="h-4 w-4" aria-hidden />
+              Save draft
+            </button>
+            <button
+              type="button"
+              onClick={publish}
+              disabled={isPublishing || isPublished}
+              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            >
+              <Rocket className="h-4 w-4" aria-hidden />
+              Publish
+            </button>
+            {isPublished && (
               <button
                 type="button"
-                onClick={handleManualSave}
-                disabled={!canSaveDraft}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                onClick={unpublish}
+                disabled={isPublishing}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
               >
-                <Save className="h-4 w-4" aria-hidden />
-                Save draft
+                <Undo2 className="h-4 w-4" aria-hidden />
+                Unpublish
               </button>
-              <button
-                type="button"
-                onClick={publish}
-                disabled={isPublishing || isPublished}
-                className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-              >
-                <Rocket className="h-4 w-4" aria-hidden />
-                Publish
-              </button>
-              {isPublished && (
-                <button
-                  type="button"
-                  onClick={unpublish}
-                  disabled={isPublishing}
-                  className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-                >
-                  <Undo2 className="h-4 w-4" aria-hidden />
-                  Unpublish
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={saveSnapshot}
-                disabled={!canSaveDraft}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-              >
-                <Sparkles className="h-4 w-4" aria-hidden />
-                Snapshot
-              </button>
-            </div>
+            )}
           </div>
         </div>
         {feedback && (
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-[color:var(--editor-muted)]">
+          <p className="mt-3 text-[10px] uppercase tracking-[0.3em] text-[color:var(--editor-muted)]">
             {feedback}
           </p>
         )}
-      </div>
+      </nav>
     </div>
   );
 }
