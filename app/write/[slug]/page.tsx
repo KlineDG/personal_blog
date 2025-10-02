@@ -232,13 +232,14 @@ export default function WriteSlugPage() {
 
   return (
     <div className="space-y-8 pb-32">
-      <div className="sticky top-0 z-10 space-y-3 px-5 py-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0 flex-1">
-            <label htmlFor="post-title" className="sr-only">
-              Post title
-            </label>
-            <input
+      <div className="sticky top-0 z-20 bg-[color:var(--editor-page-bg)]/90 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--editor-page-bg)]/80">
+        <div className="mx-auto w-full max-w-4xl space-y-3 px-5 py-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <label htmlFor="post-title" className="sr-only">
+                Post title
+              </label>
+              <input
               id="post-title"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
@@ -246,13 +247,14 @@ export default function WriteSlugPage() {
               className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
             />
           </div>
-          <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
-            {publishedLabel && (
-              <span className="inline-flex items-center gap-2 normal-case tracking-normal">
-                <Clock3 className="h-3.5 w-3.5" aria-hidden />
-                Live since {publishedLabel}
-              </span>
-            )}
+            <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
+              {publishedLabel && (
+                <span className="inline-flex items-center gap-2 normal-case tracking-normal">
+                  <Clock3 className="h-3.5 w-3.5" aria-hidden />
+                  Live since {publishedLabel}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -279,8 +281,8 @@ export default function WriteSlugPage() {
           </div>
         </>
       )}
-      <div className="mx-auto w-full max-w-4xl px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)] opacity-70">
+      <div className="fixed bottom-24 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[var(--editor-border)] bg-[color:var(--editor-nav-bg)] px-4 py-3 text-[10px] uppercase tracking-[0.28em] text-[color:var(--editor-muted)]">
           <span>{characterCount.toLocaleString()} characters</span>
           <div className="flex flex-wrap items-center justify-end gap-3">
             <SaveIndicator state={saving} />

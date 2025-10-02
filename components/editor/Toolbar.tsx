@@ -60,7 +60,7 @@ export default function Toolbar({
       aria-pressed={active}
       aria-label={label}
       title={label}
-      className={`group flex items-center justify-center rounded-md border border-[var(--editor-toolbar-border)] px-3 py-2 text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
+      className={`group flex items-center justify-center rounded-md border border-[var(--editor-toolbar-border)] px-3 py-2.5 text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0 ${
         orientation === "vertical"
           ? "w-12"
           : "min-w-[2.75rem]"
