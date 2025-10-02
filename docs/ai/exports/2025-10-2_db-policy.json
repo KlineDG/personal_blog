@@ -1,0 +1,748 @@
+[
+  {
+    "tables_columns_snapshot": [
+      {
+        "table": "blog_owner",
+        "columns": [
+          {
+            "name": "owner_id",
+            "comment": null,
+            "default": null,
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "owner_id"
+        ]
+      },
+      {
+        "table": "comments",
+        "columns": [
+          {
+            "name": "id",
+            "comment": null,
+            "default": "gen_random_uuid()",
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "post_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "author_id",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "parent_id",
+            "comment": null,
+            "default": null,
+            "position": 4,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "body",
+            "comment": null,
+            "default": null,
+            "position": 5,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "depth",
+            "comment": null,
+            "default": "0",
+            "position": 6,
+            "udt_name": "int4",
+            "data_type": "integer",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "is_deleted",
+            "comment": null,
+            "default": "false",
+            "position": 7,
+            "udt_name": "bool",
+            "data_type": "boolean",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 8,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "updated_at",
+            "comment": null,
+            "default": "now()",
+            "position": 9,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ]
+      },
+      {
+        "table": "folders",
+        "columns": [
+          {
+            "name": "id",
+            "comment": null,
+            "default": "gen_random_uuid()",
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "owner_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "name",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "slug",
+            "comment": null,
+            "default": null,
+            "position": 4,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "description",
+            "comment": null,
+            "default": null,
+            "position": 5,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "sort_order",
+            "comment": null,
+            "default": "0",
+            "position": 6,
+            "udt_name": "int4",
+            "data_type": "integer",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 7,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "updated_at",
+            "comment": null,
+            "default": "now()",
+            "position": 8,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ]
+      },
+      {
+        "table": "post_bookmarks",
+        "columns": [
+          {
+            "name": "user_id",
+            "comment": null,
+            "default": null,
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "post_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 3,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "user_id",
+          "post_id"
+        ]
+      },
+      {
+        "table": "post_reactions",
+        "columns": [
+          {
+            "name": "user_id",
+            "comment": null,
+            "default": null,
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "post_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "reaction",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "int2",
+            "data_type": "smallint",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 4,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "user_id",
+          "post_id"
+        ]
+      },
+      {
+        "table": "post_versions",
+        "columns": [
+          {
+            "name": "id",
+            "comment": null,
+            "default": "nextval('post_versions_id_seq'::regclass)",
+            "position": 1,
+            "udt_name": "int8",
+            "data_type": "bigint",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "post_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "actor_id",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "title",
+            "comment": null,
+            "default": null,
+            "position": 4,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "content_json",
+            "comment": null,
+            "default": null,
+            "position": 5,
+            "udt_name": "jsonb",
+            "data_type": "jsonb",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 6,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ]
+      },
+      {
+        "table": "posts",
+        "columns": [
+          {
+            "name": "id",
+            "comment": null,
+            "default": "gen_random_uuid()",
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "author_id",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "title",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "slug",
+            "comment": null,
+            "default": null,
+            "position": 4,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "content",
+            "comment": null,
+            "default": null,
+            "position": 5,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "excerpt",
+            "comment": null,
+            "default": null,
+            "position": 6,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "cover_image_url",
+            "comment": null,
+            "default": null,
+            "position": 7,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "status",
+            "comment": null,
+            "default": "'draft'::text",
+            "position": 8,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "published_at",
+            "comment": null,
+            "default": null,
+            "position": 9,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "is_deleted",
+            "comment": null,
+            "default": "false",
+            "position": 10,
+            "udt_name": "bool",
+            "data_type": "boolean",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 11,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "updated_at",
+            "comment": null,
+            "default": "now()",
+            "position": 12,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "content_json",
+            "comment": null,
+            "default": null,
+            "position": 13,
+            "udt_name": "jsonb",
+            "data_type": "jsonb",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "folder_id",
+            "comment": null,
+            "default": null,
+            "position": 14,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ]
+      },
+      {
+        "table": "profiles",
+        "columns": [
+          {
+            "name": "id",
+            "comment": null,
+            "default": null,
+            "position": 1,
+            "udt_name": "uuid",
+            "data_type": "uuid",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "username",
+            "comment": null,
+            "default": null,
+            "position": 2,
+            "udt_name": "citext",
+            "data_type": "USER-DEFINED",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "display_name",
+            "comment": null,
+            "default": null,
+            "position": 3,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "avatar_url",
+            "comment": null,
+            "default": null,
+            "position": 4,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "bio",
+            "comment": null,
+            "default": null,
+            "position": 5,
+            "udt_name": "text",
+            "data_type": "text",
+            "is_identity": "NO",
+            "is_nullable": "YES",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "created_at",
+            "comment": null,
+            "default": "now()",
+            "position": 6,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          },
+          {
+            "name": "updated_at",
+            "comment": null,
+            "default": "now()",
+            "position": 7,
+            "udt_name": "timestamptz",
+            "data_type": "timestamp with time zone",
+            "is_identity": "NO",
+            "is_nullable": "NO",
+            "is_generated": "NEVER",
+            "generated_expr": null,
+            "identity_generation": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ]
+      }
+    ]
+  }
+]
