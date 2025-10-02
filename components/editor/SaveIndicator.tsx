@@ -24,7 +24,7 @@ export default function SaveIndicator({ state }: SaveIndicatorProps) {
 
   return (
     <span
-      className="text-sm transition-colors"
+      className="text-[10px] uppercase tracking-[0.28em] transition-colors"
       style={{
         color:
           state === "saved"
