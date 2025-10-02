@@ -43,18 +43,31 @@ export default function Editor({ initial, onChange }: EditorProps) {
     editor.commands.setContent(initial, false);
   }, [editor, initial]);
 
+  const characterCount = editor ? editor.storage.characterCount.characters() : 0;
+
   return (
-    <div className="space-y-4">
-      <div
-        className="rounded-xl border border-[var(--editor-toolbar-border)] bg-[var(--editor-toolbar-bg)] px-4 py-3 shadow-[var(--editor-shadow)]"
-      >
-        <Toolbar editor={editor} accent={accentColor} />
+    <div className="space-y-6">
+      <div className="lg:hidden">
+        <div className="rounded-xl border border-[var(--editor-toolbar-border)] bg-[var(--editor-toolbar-bg)] px-4 py-3 shadow-[var(--editor-shadow)]">
+          <Toolbar editor={editor} accent={accentColor} />
+        </div>
       </div>
-      <div className="rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-card-bg)] p-6 shadow-[var(--editor-shadow)]">
-        <EditorContent editor={editor} className="tiptap" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_4.5rem]">
+        <div className="relative">
+          <div className="rounded-[2.5rem] border border-[var(--editor-border)] bg-[var(--editor-soft)] p-6 shadow-[var(--editor-shadow)]">
+            <div className="mx-auto w-full max-w-2xl rounded-[2rem] border border-[var(--editor-border)] bg-[var(--editor-card-bg)] px-8 py-10 shadow-[var(--editor-shadow)]">
+              <EditorContent editor={editor} className="tiptap" />
+            </div>
+          </div>
+        </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-28 rounded-2xl border border-[var(--editor-toolbar-border)] bg-[var(--editor-toolbar-bg)] p-3 shadow-[var(--editor-shadow)]">
+            <Toolbar editor={editor} accent={accentColor} orientation="vertical" />
+          </div>
+        </aside>
       </div>
       <div className="text-xs text-[color:var(--editor-muted)]">
-        {editor ? editor.storage.characterCount.characters() : 0} characters
+        {characterCount} characters
       </div>
     </div>
   );

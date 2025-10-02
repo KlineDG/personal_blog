@@ -1,9 +1,19 @@
 "use client";
 
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSONContent } from "@tiptap/core";
 import { useParams, useRouter } from "next/navigation";
+import {
+  CheckCircle2,
+  Clock3,
+  FilePenLine,
+  FileText,
+  Link2,
+  Rocket,
+  Save,
+  Sparkles,
+  Undo2,
+} from "lucide-react";
 
 import Editor from "@/components/editor/Editor";
 import SaveIndicator from "@/components/editor/SaveIndicator";
@@ -94,45 +104,53 @@ export default function WriteSlugPage() {
     };
   }, [router, slug, supabase]);
 
+  const pushDraftUpdate = useCallback(async () => {
+    if (!postId) return;
+    if (content == null) return;
+
+    setSaving("saving");
+    const { error } = await supabase
+      .from("posts")
+      .update({ title, content_json: content })
+      .eq("id", postId);
+
+    if (error) {
+      setSaving("error");
+      return;
+    }
+
+    setSaving("saved");
+    notifyDrafts("editor:draft-updated", { id: postId, title, slug });
+    setTimeout(() => setSaving("idle"), 1200);
+  }, [content, postId, slug, supabase, title]);
+
   useEffect(() => {
     if (!postId) return;
     if (content == null) return;
 
     setSaving("saving");
-    const timeout = setTimeout(async () => {
-
-      const { error } = await supabase
-        .from("posts")
-        .update({ title, content_json: content })
-        .eq("id", postId);
-      
-      if (error) {
-        setSaving("error");
-        return;
-      }
-
-      setSaving("saved");
-      notifyDrafts("editor:draft-updated", { id: postId, title, slug });
-      setTimeout(() => setSaving("idle"), 1200);
+    const timeout = setTimeout(() => {
+      void pushDraftUpdate();
     }, 1200);
 
     return () => clearTimeout(timeout);
-  }, [content, postId, slug, supabase, title]);
+  }, [content, postId, pushDraftUpdate]);
 
   useEffect(() => {
     const onKey = async (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        await saveVersion();
+        await handleManualSave();
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [content, postId, title]);
+  }, [handleManualSave]);
 
-  const saveVersion = async () => {
+  const saveSnapshot = useCallback(async () => {
     if (!postId) return;
+    if (content == null) return;
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return;
 
@@ -150,9 +168,9 @@ export default function WriteSlugPage() {
 
     setFeedback("Snapshot saved");
     setTimeout(() => setFeedback(null), 2500);
-  };
+  }, [content, postId, supabase, title]);
 
-  const publish = async () => {
+  const publish = useCallback(async () => {
     if (!postId) return;
     setIsPublishing(true);
     const { error } = await supabase
@@ -160,9 +178,9 @@ export default function WriteSlugPage() {
       .update({ status: "published", published_at: new Date().toISOString() })
       .eq("id", postId);
 
-
     if (error) {
       alert(error.message);
+      setIsPublishing(false);
       return;
     }
 
@@ -172,9 +190,10 @@ export default function WriteSlugPage() {
     notifyDrafts("editor:refresh-drafts");
     setFeedback("Published! Live on the home feed.");
     setTimeout(() => setFeedback(null), 3200);
-  };
+    setIsPublishing(false);
+  }, [postId, supabase]);
 
-  const unpublish = async () => {
+  const unpublish = useCallback(async () => {
     if (!postId) return;
     setIsPublishing(true);
     const { error } = await supabase
@@ -182,84 +201,140 @@ export default function WriteSlugPage() {
       .update({ status: "draft", published_at: null })
       .eq("id", postId);
 
-
     if (error) {
       alert(error.message);
+      setIsPublishing(false);
       return;
     }
 
     setStatus("draft");
-
     setPublishedAt(null);
     notifyDrafts("editor:refresh-drafts");
     setFeedback("Unpublished. The draft is private again.");
     setTimeout(() => setFeedback(null), 3200);
-  };
+    setIsPublishing(false);
+  }, [postId, supabase]);
 
+  const handleManualSave = useCallback(async () => {
+    await pushDraftUpdate();
+  }, [pushDraftUpdate]);
+
+  const isPublished = status === "published";
   const statusText = statusLabels[status];
   const publishedLabel =
-    publishedAt && status === "published"
+    publishedAt && isPublished
       ? new Date(publishedAt).toLocaleString()
       : null;
+  const canSaveDraft = Boolean(postId && content);
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-5 rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-surface)] px-5 py-6 shadow-[var(--editor-shadow)]">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex-1 space-y-3">
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Post title"
-              className="w-full border-0 bg-transparent text-3xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none"
-            />
-            <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-[color:var(--editor-muted)]">
-              <span className="rounded-full border border-[var(--editor-border)] px-3 py-1" style={status === "published" ? { borderColor: accentColor, color: accentColor } : undefined}>
-                {statusText}
-              </span>
-              {publishedLabel && <span>Live since {publishedLabel}</span>}
+    <div className="space-y-8">
+      <div
+        className="sticky top-0 z-10 space-y-3 rounded-2xl border border-[var(--editor-border)] px-5 py-5 shadow-[var(--editor-shadow)] backdrop-blur"
+        style={{ backgroundColor: "var(--editor-nav-bg)" }}
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-1 items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--editor-border)] text-[color:var(--editor-muted)]">
+              <FileText className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="post-title" className="sr-only">
+                Post title
+              </label>
+              <input
+                id="post-title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="Post title"
+                className="w-full border-0 bg-transparent text-2xl font-semibold tracking-tight text-[color:var(--editor-page-text)] outline-none placeholder:text-[color:var(--editor-muted)] focus:outline-none sm:text-3xl"
+              />
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-3 text-sm">
+          <div className="flex flex-col items-start gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] sm:flex-row sm:items-center sm:gap-4">
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1"
+              style={
+                isPublished
+                  ? { borderColor: accentColor, color: accentColor }
+                  : undefined
+              }
+            >
+              {isPublished ? (
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+              ) : (
+                <FilePenLine className="h-3.5 w-3.5" aria-hidden />
+              )}
+              {statusText}
+            </span>
+            {publishedLabel && (
+              <span className="inline-flex items-center gap-2 normal-case tracking-normal">
+                <Clock3 className="h-3.5 w-3.5" aria-hidden />
+                Live since {publishedLabel}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+      <Editor initial={content} onChange={setContent} />
+      <div className="space-y-4 rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-surface)] px-5 py-6 shadow-[var(--editor-shadow)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--editor-muted)]">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--editor-subtle-border)] px-3 py-1">
+              <Link2 className="h-3.5 w-3.5" aria-hidden />
+              {slug}
+            </span>
+            {isPublished && (
+              <a
+                href={`/posts/${slug}`}
+                className="inline-flex items-center gap-2 uppercase tracking-[0.28em] text-[color:var(--accent)] transition-colors hover:text-[var(--accent)]/80"
+              >
+                View live
+                <Rocket className="h-3.5 w-3.5" aria-hidden />
+              </a>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
             <SaveIndicator state={saving} />
             <button
               type="button"
-              onClick={saveVersion}
-
-              className="rounded-md border border-[var(--editor-border)] px-3 py-2 uppercase tracking-[0.28em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              onClick={handleManualSave}
+              disabled={!canSaveDraft}
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 uppercase tracking-[0.3em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
-              Save snapshot
+              <Save className="h-4 w-4" aria-hidden />
+              Save draft
             </button>
             <button
               type="button"
               onClick={publish}
-              disabled={isPublishing}
-              className="rounded-md bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+              disabled={isPublishing || isPublished}
+              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
+              <Rocket className="h-4 w-4" aria-hidden />
               Publish
             </button>
-            {status === "published" && (
+            {isPublished && (
               <button
                 type="button"
                 onClick={unpublish}
                 disabled={isPublishing}
-                className="rounded-md border border-[var(--editor-border)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
               >
+                <Undo2 className="h-4 w-4" aria-hidden />
                 Unpublish
               </button>
             )}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[color:var(--editor-muted)]">
-          <span>Slug: {slug}</span>
-          {status === "published" && (
-            <a
-              href={`/posts/${slug}`}
-              className="uppercase tracking-[0.28em] text-[color:var(--accent)] transition-colors hover:text-[var(--accent)]/80"
+            <button
+              type="button"
+              onClick={saveSnapshot}
+              disabled={!canSaveDraft}
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--editor-subtle-border)] px-4 py-2 text-xs uppercase tracking-[0.32em] text-[color:var(--editor-muted)] transition-colors disabled:cursor-not-allowed disabled:opacity-60 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
-              View live →
-            </a>
-          )}
+              <Sparkles className="h-4 w-4" aria-hidden />
+              Snapshot
+            </button>
+          </div>
         </div>
         {feedback && (
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-[color:var(--editor-muted)]">
@@ -267,7 +342,6 @@ export default function WriteSlugPage() {
           </p>
         )}
       </div>
-      <Editor initial={content} onChange={setContent} />
     </div>
   );
 }
