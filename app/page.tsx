@@ -7,11 +7,13 @@ import { AuthForm, type AuthMode } from "../components/auth/AuthForm";
 import { AuthShell, type AuthTheme } from "../components/auth/AuthShell";
 import {
   isSupabaseConfigured,
+  getProfile,
   signInWithPassword,
   signUpWithPassword,
   type SupabaseSession,
   upsertProfile,
 } from "../lib/supabase";
+import { createClient as createSupabaseBrowserClient } from "../lib/supabase/client";
 
 type FormState = {
   email: string;
@@ -79,7 +81,7 @@ function createPlaceholderProfile(id: string) {
   } as const;
 }
 
-function persistSession(session: SupabaseSession) {
+async function persistSession(session: SupabaseSession) {
   if (typeof window === "undefined") {
     return;
   }
@@ -90,9 +92,19 @@ function persistSession(session: SupabaseSession) {
   if (session.user.email) {
     window.localStorage.setItem("sb-user-email", session.user.email);
   }
+
+  const supabase = createSupabaseBrowserClient();
+  const { error } = await supabase.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  });
+
+  if (error) {
+    throw new Error(error.message || "Unable to persist Supabase session.");
+  }
 }
 
-function resetSessionStorage() {
+async function resetSessionStorage() {
   if (typeof window === "undefined") {
     return;
   }
@@ -101,6 +113,33 @@ function resetSessionStorage() {
   window.localStorage.removeItem("sb-refresh-token");
   window.localStorage.removeItem("sb-user-id");
   window.localStorage.removeItem("sb-user-email");
+
+  try {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut({ scope: "local" });
+  } catch (error) {
+    console.warn("Unable to clear Supabase session", error);
+  }
+}
+
+type PlaceholderProfile = ReturnType<typeof createPlaceholderProfile>;
+
+async function ensureProfile(session: SupabaseSession, fallbackProfile?: PlaceholderProfile) {
+  const profileId = session.user.id;
+  if (!profileId) {
+    throw new Error("Unable to resolve the authenticated user's identifier.");
+  }
+
+  const existingProfile = await getProfile(session.access_token, profileId);
+  if (existingProfile) {
+    return existingProfile;
+  }
+
+  const profile = fallbackProfile ?? createPlaceholderProfile(profileId);
+  await upsertProfile(session.access_token, {
+    id: profileId,
+    ...profile,
+  });
 }
 
 export default function AuthGateway() {
@@ -162,7 +201,8 @@ export default function AuthGateway() {
     try {
       if (mode === "signin") {
         const session = await signInWithPassword(form.email, form.password);
-        persistSession(session);
+        await ensureProfile(session);
+        await persistSession(session);
         router.replace("/home");
         return;
       }
@@ -173,7 +213,7 @@ export default function AuthGateway() {
         setInfo(
           "Check your inbox to confirm the sign-up. You'll be able to log in after verifying your email address.",
         );
-        resetSessionStorage();
+        await resetSessionStorage();
         return;
       }
 
@@ -188,12 +228,8 @@ export default function AuthGateway() {
 
       const placeholderProfile = createPlaceholderProfile(profileId);
 
-      await upsertProfile(session.access_token, {
-        id: profileId,
-        ...placeholderProfile,
-      });
-
-      persistSession(session);
+      await ensureProfile(session, placeholderProfile);
+      await persistSession(session);
       router.replace("/home");
     } catch (authError) {
       const message = authError instanceof Error ? authError.message : "Something went wrong. Please try again.";

@@ -12,6 +12,16 @@ export type SupabaseSession = {
 
 export type SupabaseUser = SupabaseSession["user"];
 
+export type ProfileRecord = {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 type SupabaseAuthResponse = {
   access_token?: string;
   refresh_token?: string;
@@ -179,4 +189,35 @@ export async function upsertProfile(
       errorPayload?.error_description || errorPayload?.message || errorPayload?.error || response.statusText;
     throw new Error(message || "Unable to create profile record.");
   }
+}
+
+export async function getProfile(accessToken: string, id: string): Promise<ProfileRecord | null> {
+  const { url } = requireConfig();
+  const params = new URLSearchParams({
+    select: "id,username,display_name,avatar_url,bio,created_at,updated_at",
+    id: `eq.${id}`,
+  });
+
+  const response = await fetch(`${url}/rest/v1/profiles?${params.toString()}`, {
+    method: "GET",
+    headers: buildHeaders({
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json",
+    }),
+  });
+
+  const payload = await parseJsonSafe<ProfileRecord[] | SupabaseErrorPayload>(response);
+
+  if (!response.ok) {
+    const errorPayload = payload as SupabaseErrorPayload | null;
+    const message =
+      errorPayload?.error_description || errorPayload?.message || errorPayload?.error || response.statusText;
+    throw new Error(message || "Unable to fetch profile record.");
+  }
+
+  if (!payload || !Array.isArray(payload)) {
+    return null;
+  }
+
+  return payload[0] ?? null;
 }
