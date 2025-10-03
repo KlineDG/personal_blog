@@ -49,7 +49,7 @@ export default function ItemActionMenu({
         <button
           type="button"
           onClick={handleRename}
-          className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-all hover:text-yellow-400 hover:shadow-[0_0_0.75rem_rgba(250,204,21,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+          className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-colors hover:text-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
           aria-label="Rename"
         >
           <Pencil className="h-4 w-4" aria-hidden />
@@ -60,7 +60,7 @@ export default function ItemActionMenu({
           <button
             type="button"
             onClick={handleDelete}
-            className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-all hover:text-[color:var(--editor-danger, #d92c20)] hover:shadow-[0_0_0.75rem_rgba(217,44,32,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-colors hover:text-[color:var(--editor-danger, #d92c20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             aria-label="Delete"
           >
             <Trash2 className="h-4 w-4" aria-hidden />
@@ -75,20 +75,23 @@ export default function ItemActionMenu({
               onClick={handleCancelDelete}
             >
               <div
-                className="w-full max-w-sm rounded-lg border border-[var(--editor-border)] bg-[color:var(--editor-surface,#ffffff)] p-6 text-[color:var(--editor-page-text)] shadow-xl"
+                className="w-full max-w-sm rounded-lg border border-current bg-[color:var(--editor-page-text)] p-6 text-[color:var(--editor-page-bg)] shadow-2xl"
                 onClick={(event) => event.stopPropagation()}
               >
                 <h2 id={confirmTitleId} className="text-lg font-semibold">
                   Delete item
                 </h2>
-                <p id={confirmDescriptionId} className="mt-2 text-sm text-[color:var(--editor-muted)]">
+                <p
+                  id={confirmDescriptionId}
+                  className="mt-2 text-sm text-[color:color-mix(in_srgb,var(--editor-page-bg)_80%,var(--editor-page-text)_20%)]"
+                >
                   Are you sure you want to delete this item? This action cannot be undone.
                 </p>
                 <div className="mt-6 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={handleCancelDelete}
-                    className="rounded-md border border-[var(--editor-border)] px-3 py-1.5 text-sm font-medium text-[color:var(--editor-page-text)] transition-colors hover:bg-[var(--editor-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                    className="rounded-md border border-current px-3 py-1.5 text-sm font-medium text-[color:var(--editor-page-bg)] transition-colors hover:bg-[color:var(--editor-page-bg)] hover:text-[color:var(--editor-page-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
                   >
                     Cancel
                   </button>
