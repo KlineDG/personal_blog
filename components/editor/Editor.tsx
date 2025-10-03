@@ -79,7 +79,7 @@ export default function Editor({ initial, onChange, onReady, onCharacterCountCha
 
   return (
     <div className="mx-auto w-full max-w-4xl px-5">
-      <div className="rounded-lg bg-[color:var(--editor-page-bg)] px-6 py-8">
+      <div className="rounded-lg bg-[color:var(--editor-page-bg)] px-6 py-6">
         <EditorContent editor={editor} className="tiptap" />
       </div>
     </div>
