@@ -680,11 +680,6 @@ export default function DraftsSidebar() {
 
   const handleDeleteFolder = useCallback(
     async (folderId: string) => {
-      const confirmed = window.confirm("Delete this folder? Drafts will be moved to Unfiled.");
-      if (!confirmed) {
-        return;
-      }
-
       const { error } = await supabase.from("folders").delete().eq("id", folderId);
       if (error) {
         window.alert(`Unable to delete folder: ${error.message}`);
@@ -746,11 +741,6 @@ export default function DraftsSidebar() {
 
   const handleDeleteDraft = useCallback(
     async (draftId: string) => {
-      const confirmed = window.confirm("Delete this draft?");
-      if (!confirmed) {
-        return;
-      }
-
       const { error } = await supabase
         .from("posts")
         .update({ is_deleted: true })
@@ -763,6 +753,7 @@ export default function DraftsSidebar() {
 
       setDrafts((prev) => prev.filter((draft) => draft.id !== draftId));
       setRenamingDraftId((prev) => (prev === draftId ? null : prev));
+      window.dispatchEvent(new Event("editor:refresh-drafts"));
     },
     [supabase],
   );
