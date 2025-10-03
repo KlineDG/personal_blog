@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSONContent } from "@tiptap/core";
+import ThumbnailPreviewPage from "@/components/post/preview";
 
 import { createClient } from "@/lib/supabase/client";
 
