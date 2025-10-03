@@ -156,9 +156,9 @@ export function PostThumbnail({
 
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition duration-200 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-white ${className}`}
+      className={`group relative flex h-full w-full basis-full flex-col overflow-hidden rounded-xl transition duration-200 sm:basis-1/2 xl:basis-1/3 ${className}`}
     >
-      <div className="relative h-52 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 sm:h-60">
+      <div className="relative h-56 w-full overflow-hidden sm:h-64">
         <Image
           src={thumbnail.src}
           alt={thumbnail.alt}
@@ -175,27 +175,27 @@ export function PostThumbnail({
           {dateLabel && isoDate ? (
             <time
               dateTime={isoDate}
-              className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400"
+              className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-700 dark:text-zinc-300"
             >
               {dateLabel}
             </time>
           ) : null}
 
-          <h2 className="text-2xl font-semibold text-zinc-900 transition-colors duration-200 group-hover:text-zinc-600 dark:text-zinc-50 dark:group-hover:text-zinc-200">
+          <h2 className="text-2xl font-semibold text-zinc-900 transition-colors duration-200 group-hover:text-zinc-700 dark:text-zinc-50 dark:group-hover:text-zinc-100">
             <Link href={postHref} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-200">
               {title}
             </Link>
           </h2>
         </header>
 
-        <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300">{excerpt}</p>
+        <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">{excerpt}</p>
 
         {visibleTags.length ? (
           <ul className="flex flex-wrap gap-2">
             {visibleTags.map((tag) => (
               <li
                 key={tag}
-                className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-500 transition-colors duration-200 dark:border-zinc-700 dark:text-zinc-400"
+                className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-600 transition-colors duration-200 dark:border-zinc-600 dark:text-zinc-300"
               >
                 {tag}
               </li>
@@ -203,18 +203,18 @@ export function PostThumbnail({
           </ul>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-4 border-t border-zinc-100 pt-4 text-sm dark:border-zinc-800">
+        <div className="mt-auto flex items-center justify-between gap-4 border-t border-zinc-200 pt-4 text-sm dark:border-zinc-700">
           <button
             type="button"
             onClick={handleCopySlug}
-            className="flex items-center gap-2 rounded-full border border-zinc-200 px-3 py-2 font-medium text-zinc-600 transition duration-200 hover:border-zinc-400 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-zinc-100 dark:focus-visible:ring-zinc-100"
+            className="flex items-center gap-2 rounded-full border border-zinc-300 px-3 py-2 font-medium text-zinc-700 transition duration-200 hover:border-zinc-500 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-zinc-100"
           >
             <span className="truncate text-left font-mono text-xs sm:text-sm">{shareLink}</span>
           </button>
 
           <span
             aria-live="polite"
-            className="text-xs font-medium text-zinc-500 transition-opacity duration-200 dark:text-zinc-400"
+            className="text-xs font-medium text-zinc-600 transition-opacity duration-200 dark:text-zinc-300"
           >
             {copyState === 'copied' && 'Link copied!'}
             {copyState === 'failed' && 'Copy failed'}
