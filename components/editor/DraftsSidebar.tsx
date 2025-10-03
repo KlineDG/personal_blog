@@ -4,16 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import {
-  ChevronDown,
-  ChevronRight,
-  FilePlus,
-  FileText,
-  Folder,
-  FolderOpen,
-  FolderPlus,
-  Folders,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, FilePlus, Folder, FolderOpen, FolderPlus, Folders } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -87,7 +78,7 @@ type TreeNodeItemProps = {
 
 const UNFILED_FOLDER_ID = "workspace-unfiled";
 
-const INDENT_STEP_REM = 0.75;
+const INDENT_STEP_REM = 1.25;
 
 const toTitle = (title: string | null) => (title && title.trim().length > 0 ? title : "Untitled draft");
 
@@ -112,7 +103,7 @@ function TreeNodeItem({
   onCancelFolderRename,
   onCancelDraftRename,
 }: TreeNodeItemProps) {
-  const indentStyle = { paddingLeft: `${Math.max(0, depth - 1) * INDENT_STEP_REM}rem` };
+  const indentStyle = { paddingLeft: `${Math.max(0, depth) * INDENT_STEP_REM}rem` };
   const [folderName, setFolderName] = useState(node.type === "folder" ? node.name : "");
   const [draftName, setDraftName] = useState(node.type === "draft" ? node.name : "");
   const [folderSubmitting, setFolderSubmitting] = useState(false);
@@ -367,12 +358,7 @@ function TreeNodeItem({
           }}
         >
           {isRenaming ? (
-            <form onSubmit={handleSubmit} className="flex min-w-0 flex-1 items-center gap-2" spellCheck={false}>
-              <FileText
-                aria-hidden
-                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)]"
-                style={isActive ? { color: accentColor } : undefined}
-              />
+            <form onSubmit={handleSubmit} className="flex min-w-0 flex-1 items-center" spellCheck={false}>
               <input
                 ref={draftInputRef}
                 value={draftName}
@@ -387,14 +373,9 @@ function TreeNodeItem({
           ) : (
             <Link
               href={`/write/${node.slug}`}
-              className="flex min-w-0 flex-1 items-center gap-2"
+              className="flex min-w-0 flex-1 items-center"
               title={formatUpdatedAt(node.updatedAt)}
             >
-              <FileText
-                aria-hidden
-                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)] transition-colors group-hover:text-[var(--accent)]"
-                style={isActive ? { color: accentColor } : undefined}
-              />
               <span
                 className="truncate group-hover:text-[var(--accent)]"
                 style={isActive ? { color: accentColor } : undefined}
