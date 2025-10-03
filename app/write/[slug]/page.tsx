@@ -207,7 +207,7 @@ export default function WriteSlugPage() {
   const canSaveDraft = Boolean(postId && content);
 
   return (
-    <div className="space-y-8 pb-32">
+    <div className="space-y-6 pb-32">
       <div className="sticky top-0 z-20 bg-[color:var(--editor-page-bg)]/90 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--editor-page-bg)]/80">
         <div className="mx-auto w-full max-w-4xl space-y-3 px-5 py-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

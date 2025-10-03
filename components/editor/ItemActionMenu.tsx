@@ -60,7 +60,7 @@ export default function ItemActionMenu({
           <button
             type="button"
             onClick={handleDelete}
-            className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-colors hover:text-[color:var(--editor-danger, #d92c20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+            className="flex h-6 w-6 items-center justify-center rounded-sm text-[color:var(--editor-muted)] transition-colors hover:text-[color:var(--editor-danger)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             aria-label="Delete"
           >
             <Trash2 className="h-4 w-4" aria-hidden />
@@ -98,7 +98,7 @@ export default function ItemActionMenu({
                   <button
                     type="button"
                     onClick={handleConfirmDelete}
-                    className="rounded-md bg-[color:var(--editor-danger, #d92c20)] px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[color:var(--editor-danger-strong,#b81f16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
+                    className="rounded-md border border-[color:var(--editor-danger)] px-3 py-1.5 text-sm font-semibold text-[color:var(--editor-danger)] transition-colors hover:bg-[color:color-mix(in_srgb,var(--editor-danger)_15%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
                   >
                     Delete
                   </button>
