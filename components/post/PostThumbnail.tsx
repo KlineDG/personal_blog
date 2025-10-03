@@ -156,15 +156,15 @@ export function PostThumbnail({
 
   return (
     <article
-      className={`group relative flex h-full w-full flex-col overflow-hidden border border-zinc-200 bg-white transition duration-200 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
+      className={`group relative flex h-full w-full flex-col overflow-hidden border border-zinc-300 bg-white transition-colors duration-200 hover:border-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-100/50 ${className}`}
     >
-      <div className="relative h-56 w-full overflow-hidden sm:h-64">
+      <div className="relative flex h-48 w-full items-center justify-center border-b border-zinc-200 bg-zinc-100/70 px-4 py-6 sm:h-56 dark:border-zinc-800 dark:bg-zinc-900/60">
         <Image
           src={thumbnail.src}
           alt={thumbnail.alt}
           width={thumbnail.width}
           height={thumbnail.height}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="max-h-full max-w-full object-contain transition-opacity duration-300 group-hover:opacity-90"
           priority={thumbnail.priority}
           sizes="(min-width: 640px) 640px, 100vw"
         />
@@ -195,7 +195,7 @@ export function PostThumbnail({
             {visibleTags.map((tag) => (
               <li
                 key={tag}
-                className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-600 transition-colors duration-200 dark:border-zinc-600 dark:text-zinc-300"
+                className="rounded-sm border border-zinc-300 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-600 transition-colors duration-200 group-hover:border-zinc-500 dark:border-zinc-600 dark:text-zinc-300 dark:group-hover:border-zinc-400"
               >
                 {tag}
               </li>
@@ -207,7 +207,7 @@ export function PostThumbnail({
           <button
             type="button"
             onClick={handleCopySlug}
-            className="flex items-center gap-2 rounded-full border border-zinc-300 px-3 py-2 font-medium text-zinc-700 transition duration-200 hover:border-zinc-500 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-zinc-100"
+            className="flex items-center gap-2 rounded-sm border border-zinc-300 px-3 py-2 font-medium text-zinc-700 transition-colors duration-200 hover:border-zinc-500 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-zinc-100"
           >
             <span className="truncate text-left font-mono text-xs sm:text-sm">{shareLink}</span>
           </button>
