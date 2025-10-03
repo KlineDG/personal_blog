@@ -2,7 +2,6 @@ export type PostCardPost = {
   readonly title: string;
   readonly slug: string;
   readonly excerpt?: string | null;
-  readonly summary?: string | null;
   readonly category?: string | null;
   readonly tags?: readonly string[] | null;
   readonly readingTime?: string | null;
@@ -70,7 +69,7 @@ export function PostCard({
           year: "numeric",
         })
       : undefined);
-  const excerpt = post.excerpt ?? post.summary ?? "";
+  const excerpt = post.excerpt ?? "";
 
   const containerPadding = variant === "featured" ? "p-8" : "p-6";
   const readingTime = post.readingTime ?? post.reading_time ?? null;

@@ -19,7 +19,6 @@ type SupabasePost = {
   readonly title: string | null;
   readonly slug: string;
   readonly excerpt?: string | null;
-  readonly summary?: string | null;
   readonly content_json?: JSONContent | null;
   readonly category?: string | null;
   readonly tags?: string[] | null;
@@ -56,7 +55,7 @@ function normalizePost(post: SupabasePost): PostCardPost {
   return {
     title: post.title ?? "Untitled",
     slug: post.slug,
-    excerpt: extractExcerpt(post.content_json ?? null, post.excerpt ?? post.summary ?? null),
+    excerpt: extractExcerpt(post.content_json ?? null, post.excerpt ?? null),
     category: post.category ?? undefined,
     tags: post.tags ?? undefined,
     readingTime: post.readingTime ?? post.reading_time ?? undefined,
