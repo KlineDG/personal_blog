@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSONContent } from "@tiptap/core";
-import PostThumbnail from "@/components/post/PostThumbnail";
+import ThumbnailGrid, { type ThumbnailGridItem } from "@/components/write/ThumbnailGrid";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,23 +20,7 @@ type SupabasePost = {
   readonly content_json?: JSONContent | null;
 };
 
-type ThumbnailPreview = {
-  readonly title: string;
-  readonly excerpt: string;
-  readonly slug: string;
-  readonly publishedAt: string | null;
-  readonly updatedAt: string | null;
-  readonly tags: readonly string[];
-  readonly thumbnail: {
-    readonly src: string;
-    readonly alt: string;
-    readonly width: number;
-    readonly height: number;
-    readonly priority?: boolean;
-  };
-};
-
-const THUMBNAIL_PREVIEWS: readonly ThumbnailPreview[] = [
+const THUMBNAIL_PREVIEWS: readonly ThumbnailGridItem[] = [
   {
     title: "Ideas in flow",
     excerpt: "A behind-the-scenes look at how I reshape fragments into a cohesive essay outline.",
@@ -312,21 +296,7 @@ export default function WriteIndex() {
             artwork until real posts are created.
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {THUMBNAIL_PREVIEWS.map((preview) => (
-            <PostThumbnail
-              key={preview.slug}
-              title={preview.title}
-              excerpt={preview.excerpt}
-              slug={preview.slug}
-              publishedAt={preview.publishedAt}
-              updatedAt={preview.updatedAt}
-              tags={preview.tags}
-              thumbnail={preview.thumbnail}
-              className="h-full"
-            />
-          ))}
-        </div>
+        <ThumbnailGrid items={THUMBNAIL_PREVIEWS} />
       </section>
 
       {error && (
