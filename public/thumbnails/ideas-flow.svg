@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#gradient)" />
+  <g fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round">
+    <path d="M120 420c120-160 260-160 380 0 120 160 200 160 260 40" opacity="0.5" />
+    <path d="M80 340c140-120 300-120 440 0 140 120 220 120 300 20" opacity="0.35" />
+    <path d="M160 500c100-140 220-140 320 0 100 140 180 140 240 30" opacity="0.65" />
+  </g>
+  <g fill="#0f172a">
+    <circle cx="220" cy="210" r="12" opacity="0.15" />
+    <circle cx="420" cy="160" r="18" opacity="0.2" />
+    <circle cx="610" cy="250" r="10" opacity="0.12" />
+  </g>
+  <text x="60" y="120" font-family="'Inter', sans-serif" font-size="42" font-weight="600" fill="#1e293b">Ideas in flow</text>
+  <text x="60" y="170" font-family="'Inter', sans-serif" font-size="22" fill="#334155">Turning scattered notes into a connected narrative.</text>
+</svg>

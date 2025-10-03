@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sunrise" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7" />
+      <stop offset="60%" stop-color="#fde68a" />
+      <stop offset="100%" stop-color="#fbcfe8" />
+    </linearGradient>
+    <linearGradient id="mountain" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#sunrise)" />
+  <path d="M0 430 Q160 320 320 420 T640 430 T800 420 V600 H0 Z" fill="url(#mountain)" opacity="0.65" />
+  <path d="M0 470 Q200 360 400 460 T800 470 V600 H0 Z" fill="#1e3a8a" opacity="0.35" />
+  <circle cx="620" cy="140" r="70" fill="#fde68a" opacity="0.85" />
+  <text x="60" y="120" font-family="'Inter', sans-serif" font-size="40" font-weight="600" fill="#1f2937">Morning pages</text>
+  <text x="60" y="165" font-family="'Inter', sans-serif" font-size="22" fill="#374151">Sunrise reflections before the inbox wakes up.</text>
+</svg>

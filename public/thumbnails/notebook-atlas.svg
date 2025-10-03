@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="paper" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#eef2ff" />
+      <stop offset="100%" stop-color="#e0f7fa" />
+    </linearGradient>
+    <linearGradient id="routes" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#paper)" />
+  <g stroke="#94a3b8" stroke-width="1" opacity="0.5">
+    <line x1="100" y1="80" x2="100" y2="520" />
+    <line x1="160" y1="80" x2="160" y2="520" />
+    <line x1="220" y1="80" x2="220" y2="520" />
+    <line x1="280" y1="80" x2="280" y2="520" />
+    <line x1="340" y1="80" x2="340" y2="520" />
+    <line x1="400" y1="80" x2="400" y2="520" />
+    <line x1="460" y1="80" x2="460" y2="520" />
+    <line x1="520" y1="80" x2="520" y2="520" />
+    <line x1="580" y1="80" x2="580" y2="520" />
+    <line x1="640" y1="80" x2="640" y2="520" />
+    <line x1="700" y1="80" x2="700" y2="520" />
+  </g>
+  <g fill="none" stroke="url(#routes)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 200 Q220 140 300 200 T460 220 T620 180" />
+    <path d="M160 320 Q260 260 360 320 T540 340 T680 300" opacity="0.7" />
+    <path d="M120 420 Q240 360 360 420 T540 440 T700 400" opacity="0.55" />
+  </g>
+  <g fill="#1e293b">
+    <circle cx="140" cy="200" r="12" />
+    <circle cx="300" cy="200" r="10" opacity="0.8" />
+    <circle cx="460" cy="220" r="9" opacity="0.65" />
+    <circle cx="620" cy="180" r="12" />
+  </g>
+  <text x="60" y="120" font-family="'Inter', sans-serif" font-size="40" font-weight="600" fill="#0f172a">Notebook atlas</text>
+  <text x="60" y="165" font-family="'Inter', sans-serif" font-size="22" fill="#1f2937">Mapping research trails and curiosities.</text>
+</svg>
