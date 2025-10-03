@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSONContent } from "@tiptap/core";
-import ThumbnailPreviewPage from "@/components/post/preview";
+import PostThumbnail from "@/components/post/PostThumbnail";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,6 +19,82 @@ type SupabasePost = {
   readonly excerpt?: string | null;
   readonly content_json?: JSONContent | null;
 };
+
+type ThumbnailPreview = {
+  readonly title: string;
+  readonly excerpt: string;
+  readonly slug: string;
+  readonly publishedAt: string | null;
+  readonly updatedAt: string | null;
+  readonly tags: readonly string[];
+  readonly thumbnail: {
+    readonly src: string;
+    readonly alt: string;
+    readonly width: number;
+    readonly height: number;
+    readonly priority?: boolean;
+  };
+};
+
+const THUMBNAIL_PREVIEWS: readonly ThumbnailPreview[] = [
+  {
+    title: "Ideas in flow",
+    excerpt: "A behind-the-scenes look at how I reshape fragments into a cohesive essay outline.",
+    slug: "ideas-in-flow",
+    publishedAt: "2024-05-26T08:30:00.000Z",
+    updatedAt: "2024-06-02T14:00:00.000Z",
+    tags: ["Process", "Craft", "Mindset"],
+    thumbnail: {
+      src: "/thumbnails/ideas-flow.svg",
+      alt: "Abstract wave lines over a lavender and blue gradient background",
+      width: 800,
+      height: 600,
+      priority: true,
+    },
+  },
+  {
+    title: "Morning pages ritual",
+    excerpt: "Capturing sunrise reflections and turning them into prompts worth revisiting.",
+    slug: "morning-pages-ritual",
+    publishedAt: "2024-05-18T06:45:00.000Z",
+    updatedAt: "2024-05-31T12:15:00.000Z",
+    tags: ["Habits", "Writing", "Wellness"],
+    thumbnail: {
+      src: "/thumbnails/morning-pages.svg",
+      alt: "Sunrise gradient with stylised mountain layers",
+      width: 800,
+      height: 600,
+    },
+  },
+  {
+    title: "Notebook atlas",
+    excerpt: "Mapping a research notebook so rabbit holes become navigable routes.",
+    slug: "notebook-atlas",
+    publishedAt: "2024-04-28T09:10:00.000Z",
+    updatedAt: "2024-05-12T10:00:00.000Z",
+    tags: ["Systems", "Research", "Tooling"],
+    thumbnail: {
+      src: "/thumbnails/notebook-atlas.svg",
+      alt: "Notebook grid with colourful connecting routes",
+      width: 800,
+      height: 600,
+    },
+  },
+  {
+    title: "Soundtrack notes",
+    excerpt: "Pairing playlists with essays to lock in tone, pacing, and emotion.",
+    slug: "soundtrack-notes",
+    publishedAt: "2024-04-08T19:20:00.000Z",
+    updatedAt: "2024-05-01T16:45:00.000Z",
+    tags: ["Inspiration", "Audio", "Mood"],
+    thumbnail: {
+      src: "/thumbnails/soundtrack-notes.svg",
+      alt: "Night sky gradient with neon waveform arcs",
+      width: 800,
+      height: 600,
+    },
+  },
+];
 
 type PostCard = {
   readonly id: string;
@@ -227,6 +303,31 @@ export default function WriteIndex() {
           {creating ? "Creating…" : "New draft"}
         </button>
       </div>
+
+      <section className="flex flex-col gap-6 rounded-3xl border border-[var(--editor-border)] bg-[var(--editor-surface)] p-6 shadow-[var(--editor-shadow)] sm:p-8">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold text-[color:var(--editor-page-text)]">Document thumbnails</h2>
+          <p className="text-sm text-[color:var(--editor-muted)]">
+            Preview how a handful of posts could look on your published site. These examples use placeholder
+            artwork until real posts are created.
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {THUMBNAIL_PREVIEWS.map((preview) => (
+            <PostThumbnail
+              key={preview.slug}
+              title={preview.title}
+              excerpt={preview.excerpt}
+              slug={preview.slug}
+              publishedAt={preview.publishedAt}
+              updatedAt={preview.updatedAt}
+              tags={preview.tags}
+              thumbnail={preview.thumbnail}
+              className="h-full"
+            />
+          ))}
+        </div>
+      </section>
 
       {error && (
         <div className="rounded-lg border border-[color:var(--editor-danger)] bg-[color:color-mix(in_srgb,var(--editor-danger)_10%,transparent)] px-4 py-3 text-sm text-[color:var(--editor-danger)]">
