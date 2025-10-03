@@ -9,33 +9,11 @@ export type PostCardPost = {
   readonly publishedAt?: string | null;
   readonly isoDate?: string | null;
   readonly dateLabel?: string | null;
+  readonly thumbnail?: {
+    readonly src: string;
+    readonly alt?: string;
+  } | null;
 };
-
-const BookmarkIcon = ({
-  filled = false,
-  className = "",
-}: {
-  filled?: boolean;
-  className?: string;
-}) => (
-  <svg
-    aria-hidden
-    className={className}
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path
-      d="M6 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17l-6-3.5L6 20Z"
-      fill={filled ? "currentColor" : "none"}
-    />
-  </svg>
-);
 
 export type PostCardTheme = {
   subtleText: string;
@@ -70,91 +48,96 @@ export function PostCard({
         })
       : undefined);
   const excerpt = post.excerpt ?? "";
-
-  const containerPadding = variant === "featured" ? "p-8" : "p-6";
-  const readingTime = post.readingTime ?? post.reading_time ?? null;
   const headingSize =
     variant === "featured"
-      ? "text-3xl font-semibold sm:text-4xl"
-      : "text-2xl font-semibold";
+      ? "text-3xl font-medium sm:text-4xl"
+      : "text-2xl font-medium";
   const excerptColor =
     variant === "featured" ? themeStyles.surfaceText : themeStyles.bodyText;
+  const cardBackground = theme === "night" ? "bg-zinc-900/80" : "bg-white";
+  const titleColor =
+    theme === "night" && variant === "featured"
+      ? "text-white"
+      : theme === "night"
+        ? "text-zinc-100"
+        : "text-zinc-900";
+  const tags = (post.tags ?? []).slice(0, 3);
+  const hoverShadow =
+    theme === "night"
+      ? "hover:shadow-[0_24px_40px_rgba(12,10,28,0.55)] focus-within:shadow-[0_24px_40px_rgba(12,10,28,0.55)]"
+      : "hover:shadow-[0_24px_40px_rgba(23,15,53,0.18)] focus-within:shadow-[0_24px_40px_rgba(23,15,53,0.18)]";
 
   return (
     <article
-      className={`group rounded-md border transition-colors duration-300 ${
-        variant === "featured" ? themeStyles.surface : themeStyles.border
-      } ${containerPadding} hover:border-[var(--accent)]`}
+      className={`group flex flex-col rounded-none ${cardBackground} transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--accent)]/10 focus-within:bg-[var(--accent)]/10 ${hoverShadow}`}
     >
-      {(post.category || readingTime) && (
-        <div
-          className={`flex flex-wrap items-center gap-3 text-xs ${themeStyles.subtleText}`}
-        >
-          {post.category && (
-            <span className="uppercase tracking-[0.3em]">{post.category}</span>
-          )}
-          {readingTime && <span>{readingTime}</span>}
+      <div className="px-5 pt-5">
+        <div className="relative mx-auto w-full max-w-full overflow-hidden">
+          <div className="aspect-[21/9] w-full overflow-hidden">
+            {post.thumbnail?.src ? (
+              <img
+                src={post.thumbnail.src}
+                alt={post.thumbnail.alt ?? post.title}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                loading="lazy"
+              />
+            ) : (
+              <div
+                className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,175,227,0.35),transparent)]"
+              >
+                <span className={`text-sm uppercase tracking-[0.35em] ${themeStyles.subtleText}`}>
+                  {post.category ?? "Journal"}
+                </span>
+              </div>
+            )}
+            <span
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{ background: "linear-gradient(180deg, rgba(16,12,32,0) 0%, rgba(212,175,227,0.25) 100%)" }}
+            />
+          </div>
         </div>
-      )}
-
-      <div
-        className={`${
-          variant === "featured" ? "mt-6 space-y-3" : "mt-4 space-y-2"
-        }`}
-      >
-        <TitleTag
-          className={`${headingSize} transition-colors duration-300 ${
-            theme === "night" && variant === "featured"
-              ? "text-white"
-              : variant === "featured"
-              ? "text-zinc-900"
-              : ""
-          } `}
-        >
-          <a
-
-            href={`/posts/${post.slug}`}
-            className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
-          >
-            {post.title}
-          </a>
-        </TitleTag>
-        {excerpt && <p className={`text-base sm:text-lg ${excerptColor}`}>{excerpt}</p>}
       </div>
 
-      {post.tags?.length ? (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <span
-              key={tag}
-              className={`rounded-sm border border-transparent px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] transition-colors duration-200 ${
-                theme === "night"
-                  ? "text-zinc-200 hover:border-[var(--accent)]"
-                  : "text-zinc-600 hover:border-[var(--accent)]"
-              }`}
-            >
-              {tag}
-            </span>
-          ))}
+      <div className="flex flex-col gap-6 px-5 pb-6 pt-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <div className="flex flex-1 flex-wrap items-baseline gap-x-3 gap-y-2">
+            <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
+              <a
+                href={`/posts/${post.slug}`}
+                className="rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+              >
+                {post.title}
+              </a>
+            </TitleTag>
+            {excerpt && (
+              <p className={`text-sm font-light leading-snug ${excerptColor}`}>
+                {excerpt}
+              </p>
+            )}
+          </div>
+          {tags.length > 0 && (
+            <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className={`text-xs uppercase tracking-[0.25em] ${
+                    theme === "night" ? "text-zinc-300" : "text-zinc-500"
+                  }`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-      ) : null}
 
-      <div
-        className={`mt-6 flex items-center justify-between text-xs ${themeStyles.subtleText}`}
-      >
-
-        {dateLabel && isoDate && <time dateTime={isoDate}>{dateLabel}</time>}
-        <button
-          type="button"
-          aria-label={`Save ${post.title}`}
-          className={`flex h-9 w-9 items-center justify-center rounded-sm text-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
-            theme === "night"
-              ? `text-zinc-300 hover:border-[var(--accent)] hover:text-yellow-300`
-              : `text-zinc-600 hover:border-[var(--accent)] hover:text-yellow-300`
-          }`}
-        >
-          <BookmarkIcon />
-        </button>
+        <div className={`text-xs font-light uppercase tracking-[0.3em] ${themeStyles.subtleText}`}>
+          {dateLabel && isoDate && (
+            <time className="lowercase" dateTime={isoDate}>
+              {dateLabel}
+            </time>
+          )}
+        </div>
       </div>
     </article>
   );
