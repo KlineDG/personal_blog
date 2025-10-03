@@ -270,7 +270,7 @@ export default function WriteIndex() {
   }, [loadPosts]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="w-full flex flex-col gap-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-[color:var(--editor-page-text)]">Your posts</h1>
@@ -288,7 +288,7 @@ export default function WriteIndex() {
         </button>
       </div>
 
-      <section className="flex flex-col gap-6 rounded-3xl border border-[var(--editor-border)] bg-[var(--editor-surface)] p-6 shadow-[var(--editor-shadow)] sm:p-8">
+      <section className="w-full flex flex-col gap-6 rounded-3xl border border-[var(--editor-border)] bg-[var(--editor-surface)] p-6 shadow-[var(--editor-shadow)] sm:p-8">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-[color:var(--editor-page-text)]">Document thumbnails</h2>
           <p className="text-sm text-[color:var(--editor-muted)]">

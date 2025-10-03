@@ -16,7 +16,7 @@ export function ThumbnailGrid({ items, className = "" }: ThumbnailGridProps) {
 
   return (
     <div
-      className={`grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(17rem,1fr))] ${className}`}
+      className={` w-[100%] grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(17rem,1fr))] ${className}`}
     >
       {items.map((item) => (
         <PostThumbnail key={item.slug} {...item} />
