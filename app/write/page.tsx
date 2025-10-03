@@ -16,7 +16,6 @@ type SupabasePost = {
   readonly updated_at: string | null;
   readonly created_at: string | null;
   readonly excerpt?: string | null;
-  readonly summary?: string | null;
   readonly content_json?: JSONContent | null;
 };
 
@@ -43,7 +42,7 @@ function collectText(node: JSONContent | null | undefined): string {
 }
 
 function toExcerpt(post: SupabasePost): string {
-  const fallback = post.excerpt ?? post.summary ?? "";
+  const fallback = post.excerpt ?? "";
   const plain = fallback || collectText(post.content_json ?? null);
   if (!plain) {
     return DEFAULT_EXCERPT;
@@ -99,7 +98,7 @@ export default function WriteIndex() {
 
     const { data, error } = await supabase
       .from("posts")
-      .select("id,title,slug,status,updated_at,created_at,excerpt,summary,content_json")
+      .select("id,title,slug,status,updated_at,created_at,excerpt,content_json")
       .eq("author_id", user.id)
       .eq("is_deleted", false)
       .order("updated_at", { ascending: false })

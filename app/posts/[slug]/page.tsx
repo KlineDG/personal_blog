@@ -14,8 +14,28 @@ type SupabasePost = {
   readonly content_json: JSONContent | null;
   readonly published_at: string | null;
   readonly excerpt?: string | null;
-  readonly summary?: string | null;
 };
+
+function collectText(node: JSONContent | null | undefined): string {
+  if (!node) return "";
+  if (typeof node.text === "string") {
+    return node.text;
+  }
+  if (!Array.isArray(node.content)) {
+    return "";
+  }
+  return node.content.map((child) => collectText(child as JSONContent)).join(" ");
+}
+
+function buildIntro(post: SupabasePost): string {
+  const raw = post.excerpt ?? "";
+  const plain = raw || collectText(post.content_json ?? null);
+  const normalized = plain.replace(/\s+/g, " ").trim();
+  if (!normalized) {
+    return "";
+  }
+  return normalized.length > 200 ? `${normalized.slice(0, 197).trimEnd()}…` : normalized;
+}
 
 type PostPageProps = {
   readonly params: { slug: string };
@@ -25,7 +45,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("posts")
-    .select("title,slug,content_json,published_at,excerpt,summary")
+    .select("title,slug,content_json,published_at,excerpt")
     .eq("slug", params.slug)
     .eq("status", "published")
     .eq("is_deleted", false)
@@ -40,7 +60,7 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const publishedAt = data.published_at ? new Date(data.published_at) : null;
-  const intro = data.excerpt ?? data.summary ?? "";
+  const intro = buildIntro(data);
   const accentStyle = { "--accent": "#d4afe3" } as CSSProperties;
 
   return (
