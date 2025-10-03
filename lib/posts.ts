@@ -10,6 +10,10 @@ export type PostCardPost = {
   readingTime?: string;
   category?: string;
   tags?: string[];
+  thumbnail?: {
+    src: string;
+    alt?: string;
+  } | null;
 };
 
 export type PostListRow = {
@@ -53,5 +57,6 @@ export function mapRowToPostCard(row: PostListRow): PostCardPost {
           : `${row.reading_time} min read`,
     category: row.category ?? undefined,
     tags: Array.isArray(row.tags) && row.tags.length > 0 ? row.tags : undefined,
+    thumbnail: null,
   };
 }
