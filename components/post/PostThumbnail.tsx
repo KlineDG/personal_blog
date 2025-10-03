@@ -12,7 +12,7 @@ type ThumbnailImage = {
   readonly priority?: boolean;
 };
 
-type PostThumbnailProps = {
+export type PostThumbnailProps = {
   readonly title: string;
   readonly excerpt: string;
   readonly slug: string;
@@ -156,7 +156,7 @@ export function PostThumbnail({
 
   return (
     <article
-      className={`group relative flex h-full w-full basis-full flex-col overflow-hidden rounded-xl transition duration-200 sm:basis-1/2 xl:basis-1/3 ${className}`}
+      className={`group relative flex h-full w-full flex-col overflow-hidden rounded-xl transition duration-200 ${className}`}
     >
       <div className="relative h-56 w-full overflow-hidden sm:h-64">
         <Image
