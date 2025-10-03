@@ -4,7 +4,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import { FilePlus, FolderPlus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  FilePlus,
+  FileText,
+  Folder,
+  FolderOpen,
+  FolderPlus,
+  Folders,
+} from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -78,6 +87,8 @@ type TreeNodeItemProps = {
 
 const UNFILED_FOLDER_ID = "workspace-unfiled";
 
+const INDENT_STEP_REM = 0.75;
+
 const toTitle = (title: string | null) => (title && title.trim().length > 0 ? title : "Untitled draft");
 
 const formatUpdatedAt = (updatedAt: string | null) =>
@@ -101,7 +112,7 @@ function TreeNodeItem({
   onCancelFolderRename,
   onCancelDraftRename,
 }: TreeNodeItemProps) {
-  const indentStyle = { paddingLeft: `${depth * 0.75}rem` };
+  const indentStyle = { paddingLeft: `${Math.max(0, depth - 1) * INDENT_STEP_REM}rem` };
   const [folderName, setFolderName] = useState(node.type === "folder" ? node.name : "");
   const [draftName, setDraftName] = useState(node.type === "draft" ? node.name : "");
   const [folderSubmitting, setFolderSubmitting] = useState(false);
@@ -209,6 +220,10 @@ function TreeNodeItem({
     const isExpanded = expandedFolders.includes(node.id);
     const isRenaming = renamingFolderId === node.id;
 
+    const ToggleIcon = isExpanded ? ChevronDown : ChevronRight;
+    const FolderIcon =
+      node.origin === "system" ? (isExpanded ? FolderOpen : Folder) : Folders;
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       folderSubmitRef.current = true;
@@ -244,8 +259,14 @@ function TreeNodeItem({
               onClick={() => onToggle(node.id)}
               className="flex items-center gap-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
-              <span aria-hidden className="text-[0.65rem]">{isExpanded ? "▾" : "▸"}</span>
-              <span aria-hidden className="text-base">{node.origin === "system" ? "📂" : "🗂"}</span>
+              <ToggleIcon
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)] transition-colors group-hover:text-[var(--accent)]"
+              />
+              <FolderIcon
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)] transition-colors group-hover:text-[var(--accent)]"
+              />
             </button>
             {isRenaming ? (
               <form onSubmit={handleSubmit} className="flex-1" spellCheck={false}>
@@ -280,7 +301,7 @@ function TreeNodeItem({
           )}
         </div>
         {isExpanded && node.children.length > 0 && (
-          <ul className="mt-1 space-y-1">
+          <ul className="mt-1 space-y-1 pl-3">
             {node.children.map((child) => (
               <TreeNodeItem
                 key={child.id}
@@ -347,7 +368,11 @@ function TreeNodeItem({
         >
           {isRenaming ? (
             <form onSubmit={handleSubmit} className="flex min-w-0 flex-1 items-center gap-2" spellCheck={false}>
-              <span aria-hidden className="text-base">📄</span>
+              <FileText
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)]"
+                style={isActive ? { color: accentColor } : undefined}
+              />
               <input
                 ref={draftInputRef}
                 value={draftName}
@@ -365,7 +390,11 @@ function TreeNodeItem({
               className="flex min-w-0 flex-1 items-center gap-2"
               title={formatUpdatedAt(node.updatedAt)}
             >
-              <span aria-hidden className="text-base">📄</span>
+              <FileText
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-[color:var(--editor-muted)] transition-colors group-hover:text-[var(--accent)]"
+                style={isActive ? { color: accentColor } : undefined}
+              />
               <span
                 className="truncate group-hover:text-[var(--accent)]"
                 style={isActive ? { color: accentColor } : undefined}
