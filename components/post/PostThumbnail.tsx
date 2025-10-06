@@ -158,15 +158,14 @@ export function PostThumbnail({
     <article
       className={`group relative flex h-full w-full flex-col overflow-hidden border border-zinc-300 bg-white transition-colors duration-200 hover:border-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-100/50 ${className}`}
     >
-      <div className="relative flex h-60 w-full border items-center justify-center bg-zinc-100/70 px-4 py-3 sm:h-44 sm:px-6 sm:py-4 dark:bg-zinc-900/60">
+      <div className="relative h-60 w-full overflow-hidden border bg-zinc-100/70 sm:h-44 dark:bg-zinc-900/60">
         <Image
           src={thumbnail.src}
           alt={thumbnail.alt}
-          width={thumbnail.width}
-          height={thumbnail.height}
-          className="h-full w-full object-contain transition-opacity duration-300 group-hover:opacity-90"
+          fill
+          className="object-cover transition-opacity duration-300 group-hover:opacity-90"
           priority={thumbnail.priority}
-          sizes="(min-width: 640px) 640px, 100vw"
+          sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
         />
       </div>
 
