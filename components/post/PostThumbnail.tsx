@@ -158,7 +158,7 @@ export function PostThumbnail({
     <article
       className={`group relative flex h-full w-full flex-col overflow-hidden border border-zinc-300 bg-white transition-colors duration-200 hover:border-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-100/50 ${className}`}
     >
-      <div className="relative h-60 w-full overflow-hidden border bg-zinc-100/70 sm:h-44 dark:bg-zinc-900/60">
+      <div className="relative h-72 w-full overflow-hidden bg-zinc-100/70 sm:h-56 dark:bg-zinc-900/60">
         <Image
           src={thumbnail.src}
           alt={thumbnail.alt}
