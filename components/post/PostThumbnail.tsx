@@ -158,7 +158,7 @@ export function PostThumbnail({
     <article
       className={`group relative flex h-full w-full flex-col overflow-hidden border border-zinc-300 bg-white transition-colors duration-200 hover:border-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-100/50 ${className}`}
     >
-      <div className="relative flex h-40 w-full items-center justify-center bg-zinc-100/70 p-4 sm:h-48 sm:p-6 dark:bg-zinc-900/60">
+      <div className="relative flex h-36 w-full items-center justify-center bg-zinc-100/70 px-4 py-3 sm:h-44 sm:px-6 sm:py-4 dark:bg-zinc-900/60">
         <Image
           src={thumbnail.src}
           alt={thumbnail.alt}
@@ -170,8 +170,8 @@ export function PostThumbnail({
         />
       </div>
 
-      <div className="flex flex-1 flex-col gap-6 p-6 sm:p-8">
-        <header className="flex flex-col gap-3">
+      <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
+        <header className="flex flex-col gap-2.5">
           {dateLabel && isoDate ? (
             <time
               dateTime={isoDate}
