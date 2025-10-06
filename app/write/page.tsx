@@ -288,17 +288,6 @@ export default function WriteIndex() {
         </button>
       </div>
 
-      <section className="w-full flex flex-col gap-6 rounded-3xl border border-[var(--editor-border)] p-6 shadow-[var(--editor-shadow)] sm:p-8">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-[color:var(--editor-page-text)]">Document thumbnails</h2>
-          <p className="text-sm text-[color:var(--editor-muted)]">
-            Preview how a handful of posts could look on your published site. These examples use placeholder
-            artwork until real posts are created.
-          </p>
-        </div>
-        <ThumbnailGrid items={THUMBNAIL_PREVIEWS} />
-      </section>
-
       {error && (
         <div className="rounded-lg border border-[color:var(--editor-danger)] bg-[color:color-mix(in_srgb,var(--editor-danger)_10%,transparent)] px-4 py-3 text-sm text-[color:var(--editor-danger)]">
           <div className="flex items-center justify-between gap-4">
@@ -323,25 +312,9 @@ export default function WriteIndex() {
           You haven&apos;t created any drafts yet. Start by clicking <span className="font-medium text-[color:var(--accent)]">New draft</span>.
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {posts.map((post) => (
-            <button
-              key={post.id}
-              type="button"
-              onClick={() => router.push(`/write/${post.slug}`)}
-              className="group flex h-full flex-col rounded-2xl border border-[var(--editor-border)] bg-[var(--editor-surface)] p-5 text-left shadow-[var(--editor-shadow)] transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
-            >
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.25em] text-[color:var(--editor-muted)]">
-                <span>{post.status === "published" ? "Published" : "Draft"}</span>
-                <span>{formatUpdatedAt(post.updatedAt)}</span>
-              </div>
-              <h2 className="mt-4 text-lg font-semibold text-[color:var(--editor-page-text)] transition-colors group-hover:text-[var(--accent)]">
-                {post.title}
-              </h2>
-              <p className="mt-3 text-sm text-[color:var(--editor-muted)]">{post.excerpt}</p>
-            </button>
-          ))}
-        </div>
+        <section className="w-full flex flex-col gap-6 rounded-3xl border-none p-6 shadow-[var(--editor-shadow)] sm:p-8">
+        <ThumbnailGrid items={THUMBNAIL_PREVIEWS} />
+      </section>
       )}
     </div>
   );

@@ -15,7 +15,7 @@ export function ThumbnailGrid({ items, className = "" }: ThumbnailGridProps) {
   }
 
   return (
-    <div className={`grid w-full gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${className}`}>
+    <div className={`grid border-none w-full gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${className}`}>
       {items.map((item) => (
         <PostThumbnail key={item.slug} {...item} />
       ))}
