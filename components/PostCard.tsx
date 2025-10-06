@@ -71,9 +71,9 @@ export function PostCard({
     <article
       className={`group flex flex-col rounded-none ${cardBackground} transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--accent)]/10 focus-within:bg-[var(--accent)]/10 ${hoverShadow}`}
     >
-      <div className="px-5 pt-5">
+      <div className="px-4 pb-3 pt-4">
         <div className="relative mx-auto w-full max-w-full overflow-hidden">
-          <div className="aspect-[21/9] w-full overflow-hidden">
+          <div className="aspect-[20/9] w-full overflow-hidden">
             {post.thumbnail?.src ? (
               <img
                 src={post.thumbnail.src}
@@ -98,8 +98,8 @@ export function PostCard({
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 px-5 pb-6 pt-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div className="flex flex-col gap-4 px-4 pb-5 pt-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
           <div className="flex flex-1 flex-wrap items-baseline gap-x-3 gap-y-2">
             <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
               <a
