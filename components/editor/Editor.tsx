@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import type { Editor as TiptapEditor } from '@tiptap/react';
+import type { EditorView } from '@tiptap/pm/view';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -33,6 +34,71 @@ export default function Editor({ initial, onChange, onReady, onCharacterCountCha
     ],
     content: initial ?? { type: 'doc', content: [{ type: 'paragraph' }] },
     autofocus: false,
+    editorProps: {
+      handleKeyDown(_: EditorView, event: KeyboardEvent) {
+        if (event.key !== 'Tab' || !editor) {
+          return false;
+        }
+
+        const INDENT = '  ';
+
+        if (editor.isActive('listItem')) {
+          if (event.shiftKey) {
+            const lifted = editor.chain().focus().liftListItem('listItem').run();
+            if (lifted) {
+              event.preventDefault();
+              return true;
+            }
+
+            return false;
+          }
+
+          const sunk = editor.chain().focus().sinkListItem('listItem').run();
+          if (sunk) {
+            event.preventDefault();
+            return true;
+          }
+
+          return false;
+        }
+
+        const adjusted = editor
+          .chain()
+          .focus()
+          .command(({ tr, state }) => {
+            const { $from } = state.selection;
+            const depth = $from.depth;
+            const block = $from.node(depth);
+
+            if (!block?.isTextblock || block.type.name !== 'paragraph') {
+              return false;
+            }
+
+            const blockStart = $from.start(depth);
+
+            if (event.shiftKey) {
+              const blockTextStart = state.doc.textBetween(blockStart, blockStart + INDENT.length, '\n', '\n');
+
+              if (!blockTextStart.startsWith(INDENT)) {
+                return false;
+              }
+
+              tr.delete(blockStart, blockStart + INDENT.length);
+              return true;
+            }
+
+            tr.insertText(INDENT, blockStart);
+            return true;
+          })
+          .run();
+
+        if (adjusted) {
+          event.preventDefault();
+        }
+
+        return adjusted;
+      },
+    },
     onUpdate({ editor }) {
       onChange(editor.getJSON());
       onCharacterCountChange?.(editor.storage.characterCount.characters());
