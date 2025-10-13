@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
+import type { Align } from "./FigureExtension";
 
 type ToolbarOrientation = "horizontal" | "vertical";
 
@@ -96,6 +97,33 @@ export default function Toolbar({
   );
 
   const pickImage = () => fileRef.current?.click();
+
+  const setTextAlignment = (alignment: Align) => {
+    const chain = editor.chain().focus();
+
+    if (alignment === "left") {
+      chain.unsetTextAlign();
+    } else {
+      chain.setTextAlign(alignment);
+    }
+
+    chain.run();
+  };
+
+  const isTextAlignmentActive = (alignment: Align) => {
+    if (alignment === "left") {
+      const centerActive = editor.isActive({ textAlign: "center" });
+      const rightActive = editor.isActive({ textAlign: "right" });
+
+      return editor.isActive({ textAlign: "left" }) || (!centerActive && !rightActive);
+    }
+
+    return editor.isActive({ textAlign: alignment });
+  };
+
+  const figureAttributes = editor.getAttributes("figure") as { align?: Align };
+  const figureAlign = figureAttributes?.align ?? "center";
+  const isFigureSelected = editor.isActive("figure");
 
   const onPick = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -192,18 +220,51 @@ export default function Toolbar({
       {button({
         icon: AlignLeft,
         label: "Align left",
-        onClick: () => editor.chain().focus().setFigureAlign("left").run(),
+        onClick: () => setTextAlignment("left"),
+        active: isTextAlignmentActive("left"),
       })}
       {button({
         icon: AlignCenter,
         label: "Align center",
-        onClick: () => editor.chain().focus().setFigureAlign("center").run(),
+        onClick: () => setTextAlignment("center"),
+        active: isTextAlignmentActive("center"),
       })}
       {button({
         icon: AlignRight,
         label: "Align right",
-        onClick: () => editor.chain().focus().setFigureAlign("right").run(),
+        onClick: () => setTextAlignment("right"),
+        active: isTextAlignmentActive("right"),
       })}
+      {isFigureSelected && (
+        <>
+          <div
+            className={
+              orientation === "vertical"
+                ? "my-1 h-px bg-[var(--editor-border)]"
+                : "mx-1 h-6 w-px bg-[var(--editor-border)]"
+            }
+            aria-hidden
+          />
+          {button({
+            icon: AlignLeft,
+            label: "Image align left",
+            onClick: () => editor.chain().focus().setFigureAlign("left").run(),
+            active: figureAlign === "left",
+          })}
+          {button({
+            icon: AlignCenter,
+            label: "Image align center",
+            onClick: () => editor.chain().focus().setFigureAlign("center").run(),
+            active: figureAlign === "center",
+          })}
+          {button({
+            icon: AlignRight,
+            label: "Image align right",
+            onClick: () => editor.chain().focus().setFigureAlign("right").run(),
+            active: figureAlign === "right",
+          })}
+        </>
+      )}
     </div>
   );
 }
