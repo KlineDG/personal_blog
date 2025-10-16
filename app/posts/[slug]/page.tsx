@@ -38,15 +38,16 @@ function buildIntro(post: SupabasePost): string {
 }
 
 type PostPageProps = {
-  readonly params: { slug: string };
+  readonly params: Promise<{ slug: string }>;
 };
 
 export default async function PostPage({ params }: PostPageProps) {
+  const { slug } = await params;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("posts")
     .select("title,slug,content_json,published_at,excerpt")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .eq("status", "published")
     .eq("is_deleted", false)
     .maybeSingle<SupabasePost>();
