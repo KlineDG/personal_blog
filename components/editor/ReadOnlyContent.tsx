@@ -31,6 +31,7 @@ export default function ReadOnlyContent({ content }: ReadOnlyContentProps) {
     content: content ?? { type: "doc", content: [] },
     editable: false,
     injectCSS: false,
+    immediatelyRender: false,
   });
 
   useEffect(() => {
