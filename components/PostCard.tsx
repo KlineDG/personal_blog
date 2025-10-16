@@ -66,7 +66,7 @@ export function PostCard({
       : theme === "night"
         ? "text-zinc-100"
         : "text-zinc-900";
-  const tags = (post.tags ?? []).slice(0, 3);
+  const tags = Array.isArray(post.tags) ? post.tags.slice(0, 3) : [];
   const hoverShadow =
     theme === "night"
       ? "hover:shadow-[0_24px_40px_rgba(12,10,28,0.55)] focus-within:shadow-[0_24px_40px_rgba(12,10,28,0.55)]"

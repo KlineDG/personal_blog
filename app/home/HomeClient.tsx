@@ -21,7 +21,7 @@ type SupabasePost = {
   readonly excerpt?: string | null;
   readonly content_json?: JSONContent | null;
   readonly category?: string | null;
-  readonly tags?: string[] | null;
+  readonly tags?: string[] | string | null;
   readonly reading_time?: string | null;
   readonly readingTime?: string | null;
   readonly published_at?: string | null;
@@ -64,6 +64,30 @@ function extractExcerpt(content: JSONContent | null | undefined, fallback: strin
   return base.length > 200 ? `${base.slice(0, 200).trimEnd()}…` : base;
 }
 
+function normalizeTags(tags: SupabasePost["tags"]): readonly string[] | undefined {
+  if (!tags) {
+    return undefined;
+  }
+
+  if (Array.isArray(tags)) {
+    const normalised = tags
+      .filter((tag): tag is string => typeof tag === "string")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+    return normalised.length > 0 ? normalised : undefined;
+  }
+
+  if (typeof tags === "string") {
+    const normalised = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+    return normalised.length > 0 ? normalised : undefined;
+  }
+
+  return undefined;
+}
+
 function normalizePost(post: SupabasePost): PostCardPost {
   const publishedAt = post.published_at ?? post.updated_at ?? null;
   const thumbnailUrl = typeof post.thumbnail_url === "string" ? post.thumbnail_url.trim() : "";
@@ -73,7 +97,7 @@ function normalizePost(post: SupabasePost): PostCardPost {
     slug: post.slug,
     excerpt: extractExcerpt(post.content_json ?? null, post.excerpt ?? null),
     category: post.category ?? undefined,
-    tags: post.tags ?? undefined,
+    tags: normalizeTags(post.tags),
     readingTime: post.readingTime ?? post.reading_time ?? undefined,
     publishedAt: publishedAt ?? undefined,
     thumbnail:
