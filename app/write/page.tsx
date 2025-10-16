@@ -18,75 +18,43 @@ type SupabasePost = {
   readonly created_at: string | null;
   readonly excerpt?: string | null;
   readonly content_json?: JSONContent | null;
+  readonly published_at?: string | null;
+  readonly tags?: string[] | null;
+  readonly thumbnail_url?: string | null;
+  readonly thumbnail_alt?: string | null;
 };
 
-const THUMBNAIL_PREVIEWS: readonly ThumbnailGridItem[] = [
+const FALLBACK_THUMBNAILS: readonly ThumbnailGridItem["thumbnail"][] = [
   {
-    title: "Ideas in flow",
-    excerpt: "A behind-the-scenes look at how I reshape fragments into a cohesive essay outline.",
-    slug: "ideas-in-flow",
-    publishedAt: "2024-05-26T08:30:00.000Z",
-    updatedAt: "2024-06-02T14:00:00.000Z",
-    tags: ["Process", "Craft", "Mindset"],
-    thumbnail: {
-      src: "/thumbnails/ideas-flow.svg",
-      alt: "Abstract wave lines over a lavender and blue gradient background",
-      width: 800,
-      height: 600,
-      priority: true,
-    },
+    src: "/thumbnails/ideas-flow.svg",
+    alt: "Abstract wave lines over a lavender and blue gradient background",
+    width: 800,
+    height: 600,
+    priority: true,
   },
   {
-    title: "Morning pages ritual",
-    excerpt: "Capturing sunrise reflections and turning them into prompts worth revisiting.",
-    slug: "morning-pages-ritual",
-    publishedAt: "2024-05-18T06:45:00.000Z",
-    updatedAt: "2024-05-31T12:15:00.000Z",
-    tags: ["Habits", "Writing", "Wellness"],
-    thumbnail: {
-      src: "/thumbnails/morning-pages.svg",
-      alt: "Sunrise gradient with stylised mountain layers",
-      width: 800,
-      height: 600,
-    },
+    src: "/thumbnails/morning-pages.svg",
+    alt: "Sunrise gradient with stylised mountain layers",
+    width: 800,
+    height: 600,
   },
   {
-    title: "Notebook atlas",
-    excerpt: "Mapping a research notebook so rabbit holes become navigable routes.",
-    slug: "notebook-atlas",
-    publishedAt: "2024-04-28T09:10:00.000Z",
-    updatedAt: "2024-05-12T10:00:00.000Z",
-    tags: ["Systems", "Research", "Tooling"],
-    thumbnail: {
-      src: "/thumbnails/notebook-atlas.svg",
-      alt: "Notebook grid with colourful connecting routes",
-      width: 800,
-      height: 600,
-    },
+    src: "/thumbnails/notebook-atlas.svg",
+    alt: "Notebook grid with colourful connecting routes",
+    width: 800,
+    height: 600,
   },
   {
-    title: "Soundtrack notes",
-    excerpt: "Pairing playlists with essays to lock in tone, pacing, and emotion.",
-    slug: "soundtrack-notes",
-    publishedAt: "2024-04-08T19:20:00.000Z",
-    updatedAt: "2024-05-01T16:45:00.000Z",
-    tags: ["Inspiration", "Audio", "Mood"],
-    thumbnail: {
-      src: "/thumbnails/soundtrack-notes.svg",
-      alt: "Night sky gradient with neon waveform arcs",
-      width: 800,
-      height: 600,
-    },
+    src: "/thumbnails/soundtrack-notes.svg",
+    alt: "Night sky gradient with neon waveform arcs",
+    width: 800,
+    height: 600,
   },
 ];
 
-type PostCard = {
+type PostCard = ThumbnailGridItem & {
   readonly id: string;
-  readonly title: string;
-  readonly slug: string;
   readonly status: PostStatus;
-  readonly updatedAt: string | null;
-  readonly excerpt: string;
 };
 
 const DEFAULT_EXCERPT = "No summary yet. Open the post to start writing.";
@@ -113,6 +81,41 @@ function toExcerpt(post: SupabasePost): string {
     return DEFAULT_EXCERPT;
   }
   return trimmed.length > 160 ? `${trimmed.slice(0, 157).trimEnd()}…` : trimmed;
+}
+
+const DEFAULT_REMOTE_THUMBNAIL_WIDTH = 1600;
+const DEFAULT_REMOTE_THUMBNAIL_HEIGHT = 900;
+
+function normaliseTags(tags: SupabasePost["tags"]): readonly string[] {
+  if (!Array.isArray(tags)) {
+    return [];
+  }
+
+  return tags
+    .filter((tag): tag is string => typeof tag === "string")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
+}
+
+function resolveThumbnail(
+  post: SupabasePost,
+  title: string,
+  fallback: ThumbnailGridItem["thumbnail"],
+): ThumbnailGridItem["thumbnail"] {
+  if (typeof post.thumbnail_url === "string" && post.thumbnail_url.trim().length > 0) {
+    const alt = typeof post.thumbnail_alt === "string" && post.thumbnail_alt.trim().length > 0
+      ? post.thumbnail_alt.trim()
+      : `Cover image for ${title}`;
+
+    return {
+      src: post.thumbnail_url,
+      alt,
+      width: DEFAULT_REMOTE_THUMBNAIL_WIDTH,
+      height: DEFAULT_REMOTE_THUMBNAIL_HEIGHT,
+    };
+  }
+
+  return { ...fallback };
 }
 
 function formatUpdatedAt(updatedAt: string | null): string {
@@ -159,7 +162,9 @@ export default function WriteIndex() {
 
     const { data, error } = await supabase
       .from("posts")
-      .select("id,title,slug,status,updated_at,created_at,excerpt,content_json")
+      .select(
+        "id,title,slug,status,updated_at,created_at,excerpt,content_json,published_at,tags,thumbnail_url,thumbnail_alt",
+      )
       .eq("author_id", user.id)
       .eq("is_deleted", false)
       .order("updated_at", { ascending: false })
@@ -175,14 +180,24 @@ export default function WriteIndex() {
       return;
     }
 
-    const normalized = (data ?? []).map((post) => ({
-      id: post.id,
-      title: (post.title ?? "Untitled").trim() || "Untitled",
-      slug: post.slug,
-      status: post.status,
-      updatedAt: post.updated_at ?? post.created_at ?? null,
-      excerpt: toExcerpt(post),
-    } satisfies PostCard));
+    const normalized = (data ?? []).map((post, index) => {
+      const title = (post.title ?? "Untitled").trim() || "Untitled";
+      const fallbackThumbnail = FALLBACK_THUMBNAILS[index % FALLBACK_THUMBNAILS.length];
+      const thumbnail = resolveThumbnail(post, title, fallbackThumbnail);
+      const tags = normaliseTags(post.tags);
+
+      return {
+        id: post.id,
+        title,
+        slug: post.slug,
+        status: post.status,
+        updatedAt: post.updated_at ?? post.created_at ?? null,
+        publishedAt: post.published_at ?? null,
+        excerpt: toExcerpt(post),
+        tags,
+        thumbnail,
+      } satisfies PostCard;
+    });
 
     setPosts(normalized);
     setLoading(false);
@@ -313,8 +328,8 @@ export default function WriteIndex() {
         </div>
       ) : (
         <section className="w-full flex flex-col gap-6 rounded-3xl border-none p-6 shadow-[var(--editor-shadow)] sm:p-8">
-        <ThumbnailGrid items={THUMBNAIL_PREVIEWS} />
-      </section>
+          <ThumbnailGrid items={posts} />
+        </section>
       )}
     </div>
   );
