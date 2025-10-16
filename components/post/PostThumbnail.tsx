@@ -123,7 +123,15 @@ export function PostThumbnail({
   const isoDate = displayDate ? displayDate.toISOString().slice(0, ISO_DATE_LENGTH) : undefined;
   const dateLabel = displayDate ? `${displayLabel} ${formatDisplayDate(displayDate, locale)}` : null;
 
-  const visibleTags = useMemo(() => tags?.filter(Boolean).slice(0, MAX_VISIBLE_TAGS) ?? [], [tags]);
+  const visibleTags = useMemo(() => {
+    if (!Array.isArray(tags)) {
+      return [];
+    }
+
+    return tags
+      .filter((tag): tag is string => typeof tag === 'string' && tag.length > 0)
+      .slice(0, MAX_VISIBLE_TAGS);
+  }, [tags]);
 
   const postHref = useMemo(() => buildPostHref(slug), [slug]);
   const shareLink = useMemo(() => buildShareLink(slug), [slug]);
