@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
+import { Bookmark, Moon, Sun, ThumbsDown, ThumbsUp } from "lucide-react";
 import type { JSONContent } from "@tiptap/core";
 
 import { PostCard, type PostCardPost, type PostCardTheme } from "@/components/PostCard";
@@ -246,9 +247,7 @@ export default function HomeClient({ posts }: HomeClientProps) {
             onClick={() => toggleLike(post.slug)}
             className={`${baseButtonClass} ${hoverClass} ${reaction.liked ? activeClass : ""}`}
           >
-            <span aria-hidden className="text-base leading-none">
-              👍
-            </span>
+            <ThumbsUp aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
               {reaction.liked ? `Remove like from ${post.title}` : `Like ${post.title}`}
             </span>
@@ -259,9 +258,7 @@ export default function HomeClient({ posts }: HomeClientProps) {
             onClick={() => toggleDislike(post.slug)}
             className={`${baseButtonClass} ${hoverClass} ${reaction.disliked ? activeClass : ""}`}
           >
-            <span aria-hidden className="text-base leading-none">
-              👎
-            </span>
+            <ThumbsDown aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
               {reaction.disliked ? `Remove dislike from ${post.title}` : `Dislike ${post.title}`}
             </span>
@@ -272,9 +269,7 @@ export default function HomeClient({ posts }: HomeClientProps) {
             onClick={() => toggleBookmark(post.slug)}
             className={`${baseButtonClass} ${hoverClass} ${reaction.bookmarked ? activeClass : ""}`}
           >
-            <span aria-hidden className="text-base leading-none">
-              🔖
-            </span>
+            <Bookmark aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
               {reaction.bookmarked ? `Remove bookmark from ${post.title}` : `Bookmark ${post.title}`}
             </span>
@@ -389,7 +384,11 @@ export default function HomeClient({ posts }: HomeClientProps) {
                   : "border-zinc-300 text-zinc-600 hover:border-[#d4afe3] hover:bg-[rgba(212,175,227,0.2)] hover:text-[#d4afe3]"
               }`}
             >
-              <span aria-hidden>{theme === "night" ? "☾" : "☀"}</span>
+              {theme === "night" ? (
+                <Moon aria-hidden className="h-4 w-4" strokeWidth={2} />
+              ) : (
+                <Sun aria-hidden className="h-4 w-4" strokeWidth={2} />
+              )}
             </button>
           </div>
           <p className={`max-w-2xl text-base sm:text-lg ${themeStyles.bodyText}`}>

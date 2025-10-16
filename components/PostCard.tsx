@@ -105,38 +105,33 @@ export function PostCard({
               />
             </div>
           </Link>
-          {actions ? (
-            <div className="pointer-events-none absolute right-3 top-3 z-10 flex gap-2">
-              <div className="pointer-events-auto">{actions}</div>
-            </div>
-          ) : null}
         </div>
       </div>
 
       <div className="flex flex-col gap-4 px-4 pb-5 pt-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
-          <div className="flex flex-1 flex-wrap items-baseline gap-x-3 gap-y-2">
-            <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
-              <Link
-                href={`/posts/${post.slug}`}
-                className="rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
-              >
-                {post.title}
-              </Link>
-            </TitleTag>
-            {excerpt && (
-              <p className={`text-sm font-light leading-snug ${excerptColor}`}>
-                {excerpt}
-              </p>
-            )}
-          </div>
+        <div className="flex flex-col gap-3">
+          <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
+            <Link
+              href={`/posts/${post.slug}`}
+              className="rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+            >
+              {post.title}
+            </Link>
+          </TitleTag>
+          {excerpt && (
+            <p className={`text-sm font-light leading-snug ${excerptColor}`}>
+              {excerpt}
+            </p>
+          )}
           {tags.length > 0 && (
-            <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
+            <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className={`text-xs uppercase tracking-[0.25em] ${
-                    theme === "night" ? "text-zinc-300" : "text-zinc-500"
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-[0.65rem] uppercase tracking-[0.25em] ${
+                    theme === "night"
+                      ? "border-white/10 bg-white/5 text-zinc-200"
+                      : "border-zinc-200 bg-zinc-100 text-zinc-600"
                   }`}
                 >
                   {tag}
@@ -146,12 +141,15 @@ export function PostCard({
           )}
         </div>
 
-        <div className={`text-xs font-light uppercase tracking-[0.3em] ${themeStyles.subtleText}`}>
-          {dateLabel && isoDate && (
-            <time className="lowercase" dateTime={isoDate}>
-              {dateLabel}
-            </time>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className={`text-xs font-light uppercase tracking-[0.3em] ${themeStyles.subtleText}`}>
+            {dateLabel && isoDate && (
+              <time className="lowercase" dateTime={isoDate}>
+                {dateLabel}
+              </time>
+            )}
+          </div>
+          {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
         </div>
       </div>
     </article>
