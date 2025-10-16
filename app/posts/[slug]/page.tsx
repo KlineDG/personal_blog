@@ -72,9 +72,13 @@ export default async function PostPage({ params }: PostPageProps) {
           </Link>
           <Link
             href="/home"
-            className="rounded-sm border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em] text-zinc-300 transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            aria-label="Back to home"
+            title="Back to home"
+            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-zinc-200 transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
           >
-            ← Back
+            <span aria-hidden className="text-lg transition-transform duration-200 group-hover:-translate-x-1">
+              ←
+            </span>
           </Link>
         </nav>
         <header className="space-y-4">
