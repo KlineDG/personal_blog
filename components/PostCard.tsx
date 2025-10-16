@@ -1,3 +1,6 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+
 export type PostCardPost = {
   readonly title: string;
   readonly slug: string;
@@ -28,6 +31,7 @@ type PostCardProps = {
   theme: "day" | "night";
   themeStyles: PostCardTheme;
   variant?: "default" | "featured";
+  actions?: ReactNode;
 };
 
 export function PostCard({
@@ -35,6 +39,7 @@ export function PostCard({
   theme,
   themeStyles,
   variant = "default",
+  actions,
 }: PostCardProps) {
   const TitleTag = (variant === "featured" ? "h2" : "h3") as const;
   const isoDate = post.isoDate ?? (post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined);
@@ -73,28 +78,38 @@ export function PostCard({
     >
       <div className="px-4 pb-3 pt-4">
         <div className="relative mx-auto w-full max-w-full overflow-hidden">
-          <div className="aspect-[20/9] w-full overflow-hidden">
-            {post.thumbnail?.src ? (
-              <img
-                src={post.thumbnail.src}
-                alt={post.thumbnail.alt ?? post.title}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                loading="lazy"
+          <Link
+            href={`/posts/${post.slug}`}
+            className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+          >
+            <div className="aspect-[20/9] w-full overflow-hidden">
+              {post.thumbnail?.src ? (
+                <img
+                  src={post.thumbnail.src}
+                  alt={post.thumbnail.alt ?? post.title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              ) : (
+                <div
+                  className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,175,227,0.35),transparent)]"
+                >
+                  <span className={`text-sm uppercase tracking-[0.35em] ${themeStyles.subtleText}`}>
+                    {post.category ?? "Journal"}
+                  </span>
+                </div>
+              )}
+              <span
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ background: "linear-gradient(180deg, rgba(16,12,32,0) 0%, rgba(212,175,227,0.25) 100%)" }}
               />
-            ) : (
-              <div
-                className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(212,175,227,0.35),transparent)]"
-              >
-                <span className={`text-sm uppercase tracking-[0.35em] ${themeStyles.subtleText}`}>
-                  {post.category ?? "Journal"}
-                </span>
-              </div>
-            )}
-            <span
-              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{ background: "linear-gradient(180deg, rgba(16,12,32,0) 0%, rgba(212,175,227,0.25) 100%)" }}
-            />
-          </div>
+            </div>
+          </Link>
+          {actions ? (
+            <div className="pointer-events-none absolute right-3 top-3 z-10 flex gap-2">
+              <div className="pointer-events-auto">{actions}</div>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -102,12 +117,12 @@ export function PostCard({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
           <div className="flex flex-1 flex-wrap items-baseline gap-x-3 gap-y-2">
             <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
-              <a
+              <Link
                 href={`/posts/${post.slug}`}
                 className="rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
               >
                 {post.title}
-              </a>
+              </Link>
             </TitleTag>
             {excerpt && (
               <p className={`text-sm font-light leading-snug ${excerptColor}`}>

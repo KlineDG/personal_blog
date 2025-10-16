@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { JSONContent } from "@tiptap/core";
 
 import { PostCard, type PostCardPost, type PostCardTheme } from "@/components/PostCard";
@@ -26,10 +26,24 @@ type SupabasePost = {
   readonly readingTime?: string | null;
   readonly published_at?: string | null;
   readonly updated_at?: string | null;
+  readonly thumbnail_url?: string | null;
+  readonly thumbnail_alt?: string | null;
 };
 
 type HomeClientProps = {
   readonly posts: readonly SupabasePost[];
+};
+
+type ReactionState = {
+  readonly liked: boolean;
+  readonly disliked: boolean;
+  readonly bookmarked: boolean;
+};
+
+const EMPTY_REACTION_STATE: ReactionState = {
+  liked: false,
+  disliked: false,
+  bookmarked: false,
 };
 
 function collectText(node: JSONContent | null | undefined): string {
@@ -52,6 +66,8 @@ function extractExcerpt(content: JSONContent | null | undefined, fallback: strin
 
 function normalizePost(post: SupabasePost): PostCardPost {
   const publishedAt = post.published_at ?? post.updated_at ?? null;
+  const thumbnailUrl = typeof post.thumbnail_url === "string" ? post.thumbnail_url.trim() : "";
+  const thumbnailAlt = typeof post.thumbnail_alt === "string" ? post.thumbnail_alt.trim() : "";
   return {
     title: post.title ?? "Untitled",
     slug: post.slug,
@@ -60,6 +76,13 @@ function normalizePost(post: SupabasePost): PostCardPost {
     tags: post.tags ?? undefined,
     readingTime: post.readingTime ?? post.reading_time ?? undefined,
     publishedAt: publishedAt ?? undefined,
+    thumbnail:
+      thumbnailUrl.length > 0
+        ? {
+            src: thumbnailUrl,
+            alt: thumbnailAlt.length > 0 ? thumbnailAlt : post.title ?? "Post thumbnail",
+          }
+        : undefined,
   };
 }
 
@@ -73,6 +96,7 @@ export default function HomeClient({ posts }: HomeClientProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const [reactions, setReactions] = useState<Record<string, ReactionState>>({});
 
   const accentVariables = useMemo(
     () =>
@@ -136,6 +160,106 @@ export default function HomeClient({ posts }: HomeClientProps) {
     });
   }, [recentPosts, searchQuery, selectedCategory]);
   const hasActiveFilters = searchQuery.trim().length > 0 || selectedCategory !== "All";
+
+  const toggleLike = useCallback((slug: string) => {
+    setReactions((current) => {
+      const previous = current[slug] ?? EMPTY_REACTION_STATE;
+      const liked = !previous.liked;
+      const next: ReactionState = {
+        liked,
+        disliked: liked ? false : previous.disliked,
+        bookmarked: previous.bookmarked,
+      };
+      return { ...current, [slug]: next };
+    });
+  }, []);
+
+  const toggleDislike = useCallback((slug: string) => {
+    setReactions((current) => {
+      const previous = current[slug] ?? EMPTY_REACTION_STATE;
+      const disliked = !previous.disliked;
+      const next: ReactionState = {
+        liked: disliked ? false : previous.liked,
+        disliked,
+        bookmarked: previous.bookmarked,
+      };
+      return { ...current, [slug]: next };
+    });
+  }, []);
+
+  const toggleBookmark = useCallback((slug: string) => {
+    setReactions((current) => {
+      const previous = current[slug] ?? EMPTY_REACTION_STATE;
+      const bookmarked = !previous.bookmarked;
+      const next: ReactionState = {
+        liked: previous.liked,
+        disliked: previous.disliked,
+        bookmarked,
+      };
+      return { ...current, [slug]: next };
+    });
+  }, []);
+
+  const buildActions = useCallback(
+    (post: PostCardPost) => {
+      const reaction = reactions[post.slug] ?? EMPTY_REACTION_STATE;
+      const containerClasses =
+        theme === "night"
+          ? "border-white/10 bg-black/60 text-zinc-200"
+          : "border-zinc-200 bg-white/85 text-zinc-700";
+      const hoverClass = theme === "night" ? "hover:bg-white/10" : "hover:bg-zinc-100";
+      const activeClass = "bg-[var(--accent)] text-[#1f0b2a]";
+      const baseButtonClass =
+        "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0";
+
+      return (
+        <div
+          className={`flex items-center gap-1 rounded-full border px-2 py-1 text-xs shadow-lg backdrop-blur ${containerClasses}`}
+        >
+          <button
+            type="button"
+            aria-pressed={reaction.liked}
+            onClick={() => toggleLike(post.slug)}
+            className={`${baseButtonClass} ${hoverClass} ${reaction.liked ? activeClass : ""}`}
+          >
+            <span aria-hidden className="text-base leading-none">
+              👍
+            </span>
+            <span className="sr-only">
+              {reaction.liked ? `Remove like from ${post.title}` : `Like ${post.title}`}
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-pressed={reaction.disliked}
+            onClick={() => toggleDislike(post.slug)}
+            className={`${baseButtonClass} ${hoverClass} ${reaction.disliked ? activeClass : ""}`}
+          >
+            <span aria-hidden className="text-base leading-none">
+              👎
+            </span>
+            <span className="sr-only">
+              {reaction.disliked ? `Remove dislike from ${post.title}` : `Dislike ${post.title}`}
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-pressed={reaction.bookmarked}
+            onClick={() => toggleBookmark(post.slug)}
+            className={`${baseButtonClass} ${hoverClass} ${reaction.bookmarked ? activeClass : ""}`}
+          >
+            <span aria-hidden className="text-base leading-none">
+              🔖
+            </span>
+            <span className="sr-only">
+              {reaction.bookmarked ? `Remove bookmark from ${post.title}` : `Bookmark ${post.title}`}
+            </span>
+          </button>
+        </div>
+      );
+    },
+    [reactions, theme, toggleBookmark, toggleDislike, toggleLike],
+  );
 
   return (
     <div
@@ -255,7 +379,13 @@ export default function HomeClient({ posts }: HomeClientProps) {
             <p className="text-xs uppercase tracking-[0.35em] opacity-80" style={{ color: accentColor }}>
               Featured
             </p>
-            <PostCard post={featuredPost} theme={theme} themeStyles={themeStyles} variant="featured" />
+            <PostCard
+              post={featuredPost}
+              theme={theme}
+              themeStyles={themeStyles}
+              variant="featured"
+              actions={buildActions(featuredPost)}
+            />
           </section>
         ) : (
           <section className="rounded-md border border-dashed border-[var(--accent)]/40 p-6 text-sm text-zinc-500">
@@ -278,7 +408,13 @@ export default function HomeClient({ posts }: HomeClientProps) {
           </div>
           <div className="space-y-6">
             {filteredPosts.map((post) => (
-              <PostCard key={post.slug} post={post} theme={theme} themeStyles={themeStyles} />
+              <PostCard
+                key={post.slug}
+                post={post}
+                theme={theme}
+                themeStyles={themeStyles}
+                actions={buildActions(post)}
+              />
             ))}
             {filteredPosts.length === 0 && (
               <p className={`text-sm ${themeStyles.subtleText}`}>
