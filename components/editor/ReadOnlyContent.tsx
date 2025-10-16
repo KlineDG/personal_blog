@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import History from "@tiptap/extension-history";
 import CharacterCount from "@tiptap/extension-character-count";
 import TextAlign from "@tiptap/extension-text-align";
 import type { JSONContent } from "@tiptap/core";
@@ -22,7 +21,6 @@ export default function ReadOnlyContent({ content }: ReadOnlyContentProps) {
       StarterKit.configure({
         history: false,
       }),
-      History,
       Link.configure({ openOnClick: true, autolink: true }),
       CharacterCount,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
