@@ -87,7 +87,7 @@ export function PostCard({
                 <img
                   src={post.thumbnail.src}
                   alt={post.thumbnail.alt ?? post.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
                   loading="lazy"
                 />
               ) : (
@@ -100,7 +100,7 @@ export function PostCard({
                 </div>
               )}
               <span
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-80"
                 style={{ background: "linear-gradient(180deg, rgba(16,12,32,0) 0%, rgba(212,175,227,0.25) 100%)" }}
               />
             </div>
@@ -108,8 +108,8 @@ export function PostCard({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 px-4 pb-5 pt-3">
-        <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5 px-4 pb-5 pt-3">
+        <div className="flex flex-col gap-4">
           <TitleTag className={`${headingSize} ${titleColor} tracking-tight`}>
             <Link
               href={`/posts/${post.slug}`}
