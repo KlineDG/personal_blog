@@ -9,6 +9,9 @@ import { Clock3, Link2, Rocket, Save, Sparkles, Undo2 } from "lucide-react";
 import Editor from "@/components/editor/Editor";
 import { useEditorTheme } from "@/components/editor/EditorShell";
 import Toolbar from "@/components/editor/Toolbar";
+import PublishModal, {
+  type PublishThumbnail,
+} from "@/components/write/PublishModal";
 import { createClient } from "@/lib/supabase/client";
 
 type PostStatus = "draft" | "published";
@@ -19,7 +22,65 @@ type DraftRecord = {
   readonly content_json: JSONContent | null;
   readonly status: PostStatus;
   readonly published_at: string | null;
+  readonly excerpt: string | null;
+  readonly tags: string[] | null;
+  readonly thumbnail_url: string | null;
+  readonly thumbnail_alt: string | null;
 };
+
+const AVAILABLE_TAGS = [
+  "Writing",
+  "Process",
+  "Craft",
+  "Mindset",
+  "Productivity",
+  "Wellness",
+  "Systems",
+  "Research",
+  "Tooling",
+  "Inspiration",
+  "Audio",
+  "Mood",
+] as const;
+
+type PublishMetadata = {
+  readonly title: string;
+  readonly summary: string;
+  readonly tags: string[];
+  readonly thumbnailUrl: string;
+  readonly thumbnailAlt?: string | null;
+  readonly thumbnailSource?: PublishThumbnail["source"];
+  readonly thumbnailName?: string | null;
+};
+
+const SUMMARY_MAX_LENGTH = 220;
+
+function collectPlainText(node: JSONContent | null | undefined): string {
+  if (!node) return "";
+  if (typeof node.text === "string") {
+    return node.text;
+  }
+  if (!Array.isArray(node.content)) {
+    return "";
+  }
+  return node.content
+    .map((child) => collectPlainText(child as JSONContent))
+    .join(" ");
+}
+
+function deriveSummary(
+  content: JSONContent | null | undefined,
+  fallback: string | null | undefined = "",
+): string {
+  const base = collectPlainText(content).trim();
+  const raw = base || fallback || "";
+  const normalized = raw.replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  if (normalized.length <= SUMMARY_MAX_LENGTH) {
+    return normalized;
+  }
+  return `${normalized.slice(0, SUMMARY_MAX_LENGTH - 1).trimEnd()}…`;
+}
 
 const notifyDrafts = (event: string, detail?: unknown) => {
   window.dispatchEvent(
@@ -45,6 +106,13 @@ export default function WriteSlugPage() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [characterCount, setCharacterCount] = useState(0);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [publishTitleInput, setPublishTitleInput] = useState("");
+  const [publishSummaryInput, setPublishSummaryInput] = useState("");
+  const [publishTags, setPublishTags] = useState<string[]>([]);
+  const [publishThumbnail, setPublishThumbnail] = useState<PublishThumbnail | null>(null);
+  const [publishThumbnailAlt, setPublishThumbnailAlt] = useState("");
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -59,7 +127,9 @@ export default function WriteSlugPage() {
       const { data, error } = await supabase
         .from("posts")
 
-        .select("id,title,content_json,status,published_at")
+        .select(
+          "id,title,content_json,status,published_at,excerpt,tags,thumbnail_url,thumbnail_alt",
+        )
         .eq("slug", slug)
         .maybeSingle<DraftRecord>();
 
@@ -77,11 +147,28 @@ export default function WriteSlugPage() {
 
 
       if (!active) return;
+      const normalizedTitle = (data.title ?? "Untitled").trim() || "Untitled";
       setPostId(data.id);
-      setTitle(data.title || "Untitled");
+      setTitle(normalizedTitle);
+      setPublishTitleInput(normalizedTitle);
       setContent((data.content_json as JSONContent | null) ?? null);
       setStatus(data.status);
       setPublishedAt(data.published_at);
+      setPublishSummaryInput(data.excerpt ?? "");
+      const initialTags = Array.isArray(data.tags)
+        ? data.tags.filter((tag): tag is string => typeof tag === "string")
+        : [];
+      setPublishTags(initialTags);
+      if (data.thumbnail_url) {
+        setPublishThumbnail({
+          url: data.thumbnail_url,
+          source: "remote",
+          name: data.thumbnail_alt ?? null,
+        });
+      } else {
+        setPublishThumbnail(null);
+      }
+      setPublishThumbnailAlt(data.thumbnail_alt ?? "");
     })();
 
     return () => {
@@ -154,28 +241,144 @@ export default function WriteSlugPage() {
     setTimeout(() => setFeedback(null), 2500);
   }, [content, postId, supabase, title]);
 
-  const publish = useCallback(async () => {
-    if (!postId) return;
-    setIsPublishing(true);
-    const { error } = await supabase
-      .from("posts")
-      .update({ status: "published", published_at: new Date().toISOString() })
-      .eq("id", postId);
+  const publish = useCallback(
+    async (metadata: PublishMetadata) => {
+      if (!postId) return false;
+      setIsPublishing(true);
+      try {
+        const now = new Date().toISOString();
+        const updates: Record<string, unknown> = {
+          status: "published",
+          published_at: now,
+          title: metadata.title,
+          excerpt: metadata.summary,
+          tags: metadata.tags,
+          thumbnail_url: metadata.thumbnailUrl,
+          thumbnail_alt: metadata.thumbnailAlt ?? null,
+        };
+        if (content != null) {
+          updates.content_json = content;
+        }
 
-    if (error) {
-      alert(error.message);
-      setIsPublishing(false);
+        const { error } = await supabase
+          .from("posts")
+          .update(updates)
+          .eq("id", postId);
+
+        if (error) {
+          alert(error.message);
+          return false;
+        }
+
+        setStatus("published");
+        setPublishedAt(now);
+        setTitle(metadata.title);
+        setPublishTitleInput(metadata.title);
+        setPublishSummaryInput(metadata.summary);
+        setPublishTags(metadata.tags);
+        setPublishThumbnail({
+          url: metadata.thumbnailUrl,
+          source: metadata.thumbnailSource ?? "preset",
+          name: metadata.thumbnailName ?? null,
+        });
+        setPublishThumbnailAlt(metadata.thumbnailAlt ?? "");
+        notifyDrafts("editor:draft-updated", { id: postId, title: metadata.title, slug });
+        notifyDrafts("editor:refresh-drafts");
+        setFeedback("Published! Live on the home feed.");
+        setTimeout(() => setFeedback(null), 3200);
+        return true;
+      } finally {
+        setIsPublishing(false);
+      }
+    },
+    [content, postId, slug, supabase],
+  );
+
+  const handleToggleTag = useCallback((tag: string) => {
+    setPublishTags((current) =>
+      current.includes(tag)
+        ? current.filter((item) => item !== tag)
+        : [...current, tag],
+    );
+  }, []);
+
+  const handleOpenPublishModal = useCallback(() => {
+    setPublishError(null);
+    setPublishTitleInput((current) => {
+      if (current.trim()) {
+        return current;
+      }
+      const normalized = title.trim() || "Untitled";
+      return normalized;
+    });
+    setPublishSummaryInput((current) => {
+      if (current.trim()) {
+        return current;
+      }
+      const generated = deriveSummary(content, title);
+      return generated || current;
+    });
+    setIsPublishModalOpen(true);
+  }, [content, title]);
+
+  const handlePublishCancel = useCallback(() => {
+    if (isPublishing) {
+      return;
+    }
+    setIsPublishModalOpen(false);
+    setPublishError(null);
+  }, [isPublishing]);
+
+  const handlePublishConfirm = useCallback(async () => {
+    const trimmedTitle = publishTitleInput.trim();
+    if (!trimmedTitle) {
+      setPublishError("Title is required to publish.");
+      return;
+    }
+    const trimmedSummary = publishSummaryInput.trim();
+    if (!trimmedSummary) {
+      setPublishError("Add a short summary before publishing.");
+      return;
+    }
+    if (publishTags.length === 0) {
+      setPublishError("Choose at least one tag.");
+      return;
+    }
+    if (!publishThumbnail || !publishThumbnail.url) {
+      setPublishError("Select a thumbnail image.");
       return;
     }
 
-    setStatus("published");
-    const now = new Date().toISOString();
-    setPublishedAt(now);
-    notifyDrafts("editor:refresh-drafts");
-    setFeedback("Published! Live on the home feed.");
-    setTimeout(() => setFeedback(null), 3200);
-    setIsPublishing(false);
-  }, [postId, supabase]);
+    const finalAlt = publishThumbnailAlt.trim();
+    setPublishTitleInput(trimmedTitle);
+    setPublishSummaryInput(trimmedSummary);
+    setPublishThumbnailAlt(finalAlt);
+    setPublishError(null);
+
+    const success = await publish({
+      title: trimmedTitle,
+      summary: trimmedSummary,
+      tags: publishTags,
+      thumbnailUrl: publishThumbnail.url,
+      thumbnailAlt: finalAlt || null,
+      thumbnailSource: publishThumbnail.source,
+      thumbnailName: publishThumbnail.name ?? null,
+    });
+
+    if (success) {
+      setIsPublishModalOpen(false);
+      setPublishError(null);
+    } else {
+      setPublishError("We couldn't publish this post. Please try again.");
+    }
+  }, [
+    publish,
+    publishSummaryInput,
+    publishTags,
+    publishThumbnail,
+    publishThumbnailAlt,
+    publishTitleInput,
+  ]);
 
   const unpublish = useCallback(async () => {
     if (!postId) return;
@@ -302,7 +505,7 @@ export default function WriteSlugPage() {
             </div>
             <button
               type="button"
-              onClick={publish}
+              onClick={handleOpenPublishModal}
               disabled={isPublishing || isPublished}
               className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-[#1f0b2a] transition-transform disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0"
             >
@@ -328,6 +531,24 @@ export default function WriteSlugPage() {
           </p>
         )}
       </nav>
+      <PublishModal
+        isOpen={isPublishModalOpen}
+        title={publishTitleInput}
+        summary={publishSummaryInput}
+        availableTags={AVAILABLE_TAGS}
+        selectedTags={publishTags}
+        thumbnail={publishThumbnail}
+        thumbnailAlt={publishThumbnailAlt}
+        error={publishError}
+        isSaving={isPublishing}
+        onTitleChange={(value) => setPublishTitleInput(value)}
+        onSummaryChange={(value) => setPublishSummaryInput(value)}
+        onToggleTag={handleToggleTag}
+        onThumbnailChange={(thumbnail) => setPublishThumbnail(thumbnail)}
+        onThumbnailAltChange={(value) => setPublishThumbnailAlt(value)}
+        onConfirm={handlePublishConfirm}
+        onCancel={handlePublishCancel}
+      />
     </div>
   );
 }
