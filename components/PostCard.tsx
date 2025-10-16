@@ -124,18 +124,13 @@ export function PostCard({
             </p>
           )}
           {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div
+              className={`flex flex-wrap gap-x-4 gap-y-1 text-[0.65rem] uppercase tracking-[0.25em] ${
+                theme === "night" ? "text-zinc-300" : "text-zinc-600"
+              }`}
+            >
               {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-[0.65rem] uppercase tracking-[0.25em] ${
-                    theme === "night"
-                      ? "border-white/10 bg-white/5 text-zinc-200"
-                      : "border-zinc-200 bg-zinc-100 text-zinc-600"
-                  }`}
-                >
-                  {tag}
-                </span>
+                <span key={tag}>{tag}</span>
               ))}
             </div>
           )}

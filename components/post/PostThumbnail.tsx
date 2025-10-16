@@ -198,16 +198,11 @@ export function PostThumbnail({
         <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">{excerpt}</p>
 
         {visibleTags.length ? (
-          <ul className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-600 dark:text-zinc-300">
             {visibleTags.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-sm border border-zinc-300 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-zinc-600 transition-colors duration-200 group-hover:border-zinc-500 dark:border-zinc-600 dark:text-zinc-300 dark:group-hover:border-zinc-400"
-              >
-                {tag}
-              </li>
+              <span key={tag}>{tag}</span>
             ))}
-          </ul>
+          </div>
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-4 border-t border-zinc-200 pt-4 text-sm dark:border-zinc-700">
