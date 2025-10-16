@@ -233,9 +233,15 @@ export default function HomeClient({ posts }: HomeClientProps) {
           ? "border-white/10 bg-black/60 text-zinc-200"
           : "border-zinc-200 bg-white/85 text-zinc-700";
       const hoverClass = theme === "night" ? "hover:bg-white/10" : "hover:bg-zinc-100";
-      const activeClass = "bg-[var(--accent)] text-[#1f0b2a]";
+      const activeBackgroundClass = theme === "night" ? "bg-white/10" : "bg-zinc-100";
       const baseButtonClass =
         "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-0";
+      const likeHoverClass = theme === "night" ? "hover:text-emerald-300" : "hover:text-emerald-600";
+      const dislikeHoverClass = theme === "night" ? "hover:text-rose-300" : "hover:text-rose-600";
+      const bookmarkHoverClass = theme === "night" ? "hover:text-amber-300" : "hover:text-amber-600";
+      const likeActiveClass = theme === "night" ? "text-emerald-300" : "text-emerald-600";
+      const dislikeActiveClass = theme === "night" ? "text-rose-300" : "text-rose-600";
+      const bookmarkActiveClass = theme === "night" ? "text-amber-300" : "text-amber-600";
 
       return (
         <div
@@ -245,7 +251,9 @@ export default function HomeClient({ posts }: HomeClientProps) {
             type="button"
             aria-pressed={reaction.liked}
             onClick={() => toggleLike(post.slug)}
-            className={`${baseButtonClass} ${hoverClass} ${reaction.liked ? activeClass : ""}`}
+            className={`${baseButtonClass} ${hoverClass} ${likeHoverClass} ${
+              reaction.liked ? `${activeBackgroundClass} ${likeActiveClass}` : ""
+            }`}
           >
             <ThumbsUp aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
@@ -256,7 +264,9 @@ export default function HomeClient({ posts }: HomeClientProps) {
             type="button"
             aria-pressed={reaction.disliked}
             onClick={() => toggleDislike(post.slug)}
-            className={`${baseButtonClass} ${hoverClass} ${reaction.disliked ? activeClass : ""}`}
+            className={`${baseButtonClass} ${hoverClass} ${dislikeHoverClass} ${
+              reaction.disliked ? `${activeBackgroundClass} ${dislikeActiveClass}` : ""
+            }`}
           >
             <ThumbsDown aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
@@ -267,7 +277,9 @@ export default function HomeClient({ posts }: HomeClientProps) {
             type="button"
             aria-pressed={reaction.bookmarked}
             onClick={() => toggleBookmark(post.slug)}
-            className={`${baseButtonClass} ${hoverClass} ${reaction.bookmarked ? activeClass : ""}`}
+            className={`${baseButtonClass} ${hoverClass} ${bookmarkHoverClass} ${
+              reaction.bookmarked ? `${activeBackgroundClass} ${bookmarkActiveClass}` : ""
+            }`}
           >
             <Bookmark aria-hidden className="h-4 w-4" strokeWidth={2} />
             <span className="sr-only">
